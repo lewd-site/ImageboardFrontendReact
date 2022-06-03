@@ -11,9 +11,12 @@
     height: 100%;
   }
 
+  &__picture {
+    transition: opacity 200ms ease;
+  }
+
   .nsfw &__picture {
     opacity: 0.05;
-    transition: opacity 200ms ease;
 
     &:hover {
       opacity: 1;

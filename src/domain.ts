@@ -64,7 +64,11 @@ export interface File {
 
   get isTransparent(): boolean;
   get originalUrl(): string;
+
+  get thumbnailWidth(): number;
+  get thumbnailHeight(): number;
   get thumbnailUrl(): string;
+
   get fallbackThumbnailExtension(): string;
   get fallbackThumbnailType(): string;
   get fallbackThumbnailUrl(): string;

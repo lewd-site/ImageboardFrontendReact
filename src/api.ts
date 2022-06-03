@@ -50,6 +50,9 @@ interface PostDto {
   readonly created_at: string;
 }
 
+const THUMB_WIDTH = 200;
+const THUMB_HEIGHT = 200;
+
 function isBoardDto(board: any): board is BoardDto {
   return (
     typeof board.slug === 'string' &&
@@ -131,15 +134,30 @@ function convertFileDtoToFile(file: FileDto): File {
     height: file.height,
     length: file.length,
     createdAt: new Date(file.created_at),
+
     get isTransparent() {
       return ['png', 'gif', 'webp'].includes(this.extension);
     },
     get originalUrl() {
       return `${config.content.baseUrl}/original/${this.hash}.${this.extension}`;
     },
+
+    get thumbnailWidth() {
+      const width = this.width || THUMB_WIDTH;
+      const height = this.height || THUMB_HEIGHT;
+
+      return width / Math.max(1, width / THUMB_WIDTH, height / THUMB_HEIGHT);
+    },
+    get thumbnailHeight() {
+      const width = this.width || THUMB_WIDTH;
+      const height = this.height || THUMB_HEIGHT;
+
+      return height / Math.max(1, width / THUMB_WIDTH, height / THUMB_HEIGHT);
+    },
     get thumbnailUrl() {
       return `${config.content.baseUrl}/thumbnails/${this.hash}.webp`;
     },
+
     get fallbackThumbnailExtension() {
       return this.isTransparent ? 'png' : 'jpg';
     },

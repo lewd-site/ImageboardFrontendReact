@@ -12,7 +12,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="nsfw">
+    <div>
       <PostList posts={posts} />
     </div>
   );

@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
-import { Post as PostModel, File as FileModel } from '../domain';
+import { Post as PostModel, File as FileModel, Markup } from '../domain';
 import { Post } from './post';
 
 interface Rect {
@@ -12,21 +12,66 @@ interface PostListProps {
   readonly posts: PostModel[];
 }
 
+const POST_HEADER_HEIGHT = 24;
+const POST_HEADER_MARGIN = 4;
+const POST_FILE_MARGIN = 4;
+const POST_MESSAGE_LINE_HEIGHT = 24;
+const POST_MARGIN = 16;
+
+function measurePost(post: PostModel): number {
+  return (
+    POST_HEADER_HEIGHT +
+    POST_HEADER_MARGIN +
+    (post.files.length > 0 ? measureFiles(post.files) + POST_FILE_MARGIN : 0) +
+    (post.message.length > 0 ? (measureMarkup(post.messageParsed) + 1) * POST_MESSAGE_LINE_HEIGHT : 0) +
+    POST_MARGIN
+  );
+}
+
+function measureFiles(files: FileModel[]): number {
+  return Math.max(...files.map((file) => file.thumbnailHeight));
+}
+
+function measureMarkup(markup: Markup[]): number {
+  return markup
+    .map((node) => {
+      switch (node.type) {
+        case 'style':
+          return measureMarkup(node.children);
+
+        case 'text':
+          return Math.floor((8 * node.text.length) / Math.min(800, window.innerWidth));
+
+        case 'newline':
+          return 1;
+
+        default:
+          return 0;
+      }
+    })
+    .reduce((prev: number, curr) => prev + curr, 0);
+}
+
 export function PostList({ posts }: PostListProps) {
-  const POST_HEADER_HEIGHT = 24;
-  const POST_HEADER_MARGIN = 4;
-  const POST_FILE_HEIGHT = 200;
-  const POST_FILE_MARGIN = 4;
-  const POST_MESSAGE_HEIGHT = 24;
-  const POST_MARGIN = 16;
+  const postHeightCache = useRef(new Map<number, number>());
+
+  useEffect(() => {
+    const handler = () => postHeightCache.current.clear();
+    window.addEventListener('resize', handler, { passive: true });
+    return () => window.removeEventListener('resize', handler);
+  });
 
   const estimateSize = useCallback(
-    (index: number) =>
-      POST_HEADER_HEIGHT +
-      POST_HEADER_MARGIN +
-      (posts[index].files.length > 0 ? POST_FILE_HEIGHT + POST_FILE_MARGIN : 0) +
-      POST_MESSAGE_HEIGHT +
-      POST_MARGIN,
+    (index: number) => {
+      if (postHeightCache.current.has(index)) {
+        return postHeightCache.current.get(index)!;
+      }
+
+      const height = measurePost(posts[index]);
+      postHeightCache.current.set(index, height);
+
+      return height;
+    },
     [posts]
   );
 
@@ -37,6 +82,7 @@ export function PostList({ posts }: PostListProps) {
         callback(scrollTop);
       }
 
+      window.addEventListener('resize', update, { passive: true });
       window.addEventListener('scroll', update, { passive: true });
       update();
     },
