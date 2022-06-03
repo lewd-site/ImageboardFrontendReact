@@ -1,0 +1,11 @@
+/.parcel-cache/
+/.yarn/*
+!/.yarn/patches
+!/.yarn/plugins
+!/.yarn/releases
+!/.yarn/sdks
+!/.yarn/versions
+/dist/
+/node_modules/
+/.env
+/yarn-error.log

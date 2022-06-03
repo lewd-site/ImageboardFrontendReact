@@ -1,0 +1,6 @@
+{
+  "plugins": {
+    "postcss-sort-media-queries": { "sort": "mobile-first" },
+    "cssnano": { "preset": ["default", { "discardComments": { "removeAll": true } }] }
+  }
+}

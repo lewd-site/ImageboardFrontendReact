@@ -1,0 +1,54 @@
+.post {
+  &__header {
+    margin-bottom: 4px;
+  }
+
+  &__author {
+    margin-right: 8px;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__tripcode {
+    &:not(:empty)::before {
+      content: '!';
+    }
+  }
+
+  &__date {
+    font-size: 0.875em;
+    opacity: 0.75;
+
+    margin-right: 8px;
+  }
+
+  &__id {
+    font-size: 0.875em;
+    opacity: 0.8;
+
+    &::before {
+      content: '#';
+    }
+  }
+
+  &__files {
+    display: flex;
+    flex-flow: row wrap;
+  }
+
+  &__file {
+    border-radius: 4px;
+    border: 1px solid transparent;
+
+    margin-right: 4px;
+    margin-bottom: 4px;
+
+    overflow: hidden;
+  }
+
+  &__message {
+    word-wrap: break-word;
+  }
+}

@@ -1,0 +1,71 @@
+@import '../node_modules/normalize.css/normalize.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: #36393f;
+  color: #eee;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+strong,
+.bold {
+  font-weight: bold;
+}
+
+em,
+.italic {
+  font-style: italic;
+}
+
+del,
+.strike {
+  text-decoration: line-through;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.spoiler {
+  background: rgba(0, 0, 0, 0.1);
+  color: transparent;
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: color 200ms ease;
+
+  &:hover {
+    color: #eee;
+  }
+}
+
+a,
+.link,
+.reflink,
+.quote {
+  color: #ea73f4;
+}
+
+a,
+.link,
+.reflink {
+  text-decoration: underline;
+}
+
+code,
+.code {
+  font-family: monospace;
+  white-space: pre;
+}
+
+img,
+audio,
+video,
+picture {
+  display: block;
+}
