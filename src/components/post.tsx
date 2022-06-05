@@ -39,7 +39,14 @@ export function Post({ className, post, onReflinkClick, onThumbnailClick }: Post
         <span className="post__id">{post.id}</span>
       </div>
 
-      <div className="post__files">{files}</div>
+      <div
+        className={[
+          'post__files',
+          files.length === 1 ? 'post__files_single' : files.length > 1 ? 'post__files_multiple' : '',
+        ].join(' ')}
+      >
+        {files}
+      </div>
       <div className="post__message">{markup}</div>
     </div>
   );

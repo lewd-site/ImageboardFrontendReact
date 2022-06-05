@@ -38,6 +38,12 @@
   &__files {
     display: flex;
     flex-flow: row wrap;
+
+    &_single {
+      float: left;
+
+      margin-right: 4px;
+    }
   }
 
   &__file {
@@ -52,5 +58,11 @@
 
   &__message {
     word-wrap: break-word;
+
+    &::after {
+      content: '';
+      display: table;
+      clear: both;
+    }
   }
 }

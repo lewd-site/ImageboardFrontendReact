@@ -21,13 +21,13 @@ const POST_MESSAGE_LINE_HEIGHT = 24;
 const POST_MARGIN = 16;
 
 function measurePost(post: PostModel): number {
-  return (
-    POST_HEADER_HEIGHT +
-    POST_HEADER_MARGIN +
-    (post.files.length > 0 ? measureFiles(post.files) + 2 * BORDER_WIDTH + POST_FILE_MARGIN : 0) +
-    (post.message.length > 0 ? measureMarkup(post.messageParsed) : 0) +
-    POST_MARGIN
-  );
+  let height = POST_HEADER_HEIGHT + POST_HEADER_MARGIN + POST_MARGIN;
+
+  const filesHeight = post.files.length > 0 ? measureFiles(post.files) + 2 * BORDER_WIDTH + POST_FILE_MARGIN : 0;
+  const messageHeight = post.message.length > 0 ? measureMarkup(post.messageParsed) : 0;
+  height += post.files.length === 1 ? Math.max(filesHeight, messageHeight) : filesHeight + messageHeight;
+
+  return height;
 }
 
 function measureFiles(files: FileModel[]): number {
@@ -127,7 +127,7 @@ export function PostList({ className, posts }: PostListProps) {
   }, []);
 
   return (
-    <div className={[className, 'post-list'].join()}>
+    <div className={[className, 'post-list'].join(' ')}>
       <div className="post-list__inner" style={{ height: `${virtualizer.getTotalSize()}px` }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
           <div

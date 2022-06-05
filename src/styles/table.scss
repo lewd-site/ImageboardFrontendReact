@@ -1,0 +1,37 @@
+.table {
+  border-collapse: collapse;
+
+  width: 100%;
+
+  &__row {
+    &_even {
+      background-color: #43474f;
+    }
+  }
+
+  &__head &__cell {
+    font-weight: bold;
+  }
+
+  &__body &__cell {
+    font-weight: normal;
+  }
+
+  &__cell {
+    text-align: center;
+
+    padding: 4px 8px;
+
+    &_left {
+      text-align: left;
+    }
+
+    &_right {
+      text-align: right;
+    }
+
+    &_expand {
+      width: 100%;
+    }
+  }
+}

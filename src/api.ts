@@ -3,14 +3,14 @@ import { Board, Markup, File, Thread, Post } from './domain';
 
 export class ApiError extends Error {}
 
-interface BoardDto {
+export interface BoardDto {
   readonly slug: string;
   readonly title: string;
   readonly created_at: string;
   readonly post_count: number;
 }
 
-interface FileDto {
+export interface FileDto {
   readonly hash: string;
   readonly extension: string;
   readonly name: string;
@@ -23,7 +23,7 @@ interface FileDto {
   readonly created_at: string;
 }
 
-interface ThreadDto {
+export interface ThreadDto {
   readonly slug: string;
   readonly id: number;
   readonly subject: string | null;
@@ -37,7 +37,7 @@ interface ThreadDto {
   readonly post_count: number;
 }
 
-interface PostDto {
+export interface PostDto {
   readonly slug: string;
   readonly id: number;
   readonly parent_id: number;
@@ -53,7 +53,7 @@ interface PostDto {
 const THUMB_WIDTH = 200;
 const THUMB_HEIGHT = 200;
 
-function isBoardDto(board: any): board is BoardDto {
+export function isBoardDto(board: any): board is BoardDto {
   return (
     typeof board.slug === 'string' &&
     typeof board.title === 'string' &&
@@ -62,7 +62,7 @@ function isBoardDto(board: any): board is BoardDto {
   );
 }
 
-function isFileDto(file: any): file is FileDto {
+export function isFileDto(file: any): file is FileDto {
   return (
     typeof file.hash === 'string' &&
     typeof file.extension === 'string' &&
@@ -77,7 +77,7 @@ function isFileDto(file: any): file is FileDto {
   );
 }
 
-function isThreadDto(thread: any): thread is ThreadDto {
+export function isThreadDto(thread: any): thread is ThreadDto {
   return (
     typeof thread.slug === 'string' &&
     typeof thread.id === 'number' &&
@@ -96,7 +96,7 @@ function isThreadDto(thread: any): thread is ThreadDto {
   );
 }
 
-function isPostDto(post: any): post is PostDto {
+export function isPostDto(post: any): post is PostDto {
   return (
     typeof post.slug === 'string' &&
     typeof post.id === 'number' &&
@@ -113,7 +113,7 @@ function isPostDto(post: any): post is PostDto {
   );
 }
 
-function convertBoardDtoToBoard(board: BoardDto): Board {
+export function convertBoardDtoToBoard(board: BoardDto): Board {
   return {
     slug: board.slug,
     title: board.title,
@@ -122,7 +122,7 @@ function convertBoardDtoToBoard(board: BoardDto): Board {
   };
 }
 
-function convertFileDtoToFile(file: FileDto): File {
+export function convertFileDtoToFile(file: FileDto): File {
   return {
     hash: file.hash,
     extension: file.extension,
@@ -170,7 +170,7 @@ function convertFileDtoToFile(file: FileDto): File {
   };
 }
 
-function convertThreadDtoToThread(thread: ThreadDto): Thread {
+export function convertThreadDtoToThread(thread: ThreadDto): Thread {
   return {
     slug: thread.slug,
     id: thread.id,
@@ -186,7 +186,7 @@ function convertThreadDtoToThread(thread: ThreadDto): Thread {
   };
 }
 
-function convertPostDtoToPost(post: PostDto): Post {
+export function convertPostDtoToPost(post: PostDto): Post {
   return {
     slug: post.slug,
     id: post.id,
