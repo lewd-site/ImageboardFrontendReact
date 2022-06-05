@@ -1,4 +1,14 @@
+@import './styles/variables.scss';
+@import './styles/mixins.scss';
+@import './styles/fonts.scss';
+@import './styles/animations.scss';
+@import '../node_modules/normalize.css/normalize.css';
 @import './styles/base.scss';
+@import './styles/icons.scss';
+@import './styles/markup.scss';
+@import './styles/layout.scss';
+@import './styles/sidebar.scss';
 @import './styles/post-list.scss';
 @import './styles/post.scss';
 @import './styles/file.scss';
+@import './styles/spinner.scss';

@@ -1,0 +1,20 @@
+%scrollbar {
+  scrollbar-color: #9da2b2 #303339;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    background: #303339;
+
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #9da2b2;
+
+    transition: background-color 100ms ease;
+
+    &:hover {
+      background: #cfd4e3;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 import { Post as PostModel, File as FileModel, Markup } from '../domain';
 import { Post } from './post';
@@ -9,12 +9,14 @@ interface Rect {
 }
 
 interface PostListProps {
+  readonly className?: string;
   readonly posts: PostModel[];
 }
 
 const POST_HEADER_HEIGHT = 24;
 const POST_HEADER_MARGIN = 4;
 const POST_FILE_MARGIN = 4;
+const BORDER_WIDTH = 1;
 const POST_MESSAGE_LINE_HEIGHT = 24;
 const POST_MARGIN = 16;
 
@@ -22,49 +24,53 @@ function measurePost(post: PostModel): number {
   return (
     POST_HEADER_HEIGHT +
     POST_HEADER_MARGIN +
-    (post.files.length > 0 ? measureFiles(post.files) + POST_FILE_MARGIN : 0) +
-    (post.message.length > 0 ? (measureMarkup(post.messageParsed) + 1) * POST_MESSAGE_LINE_HEIGHT : 0) +
+    (post.files.length > 0 ? measureFiles(post.files) + 2 * BORDER_WIDTH + POST_FILE_MARGIN : 0) +
+    (post.message.length > 0 ? measureMarkup(post.messageParsed) : 0) +
     POST_MARGIN
   );
 }
 
 function measureFiles(files: FileModel[]): number {
-  return Math.max(...files.map((file) => file.thumbnailHeight));
+  let height = 0;
+  for (const file of files) {
+    height = Math.max(height, file.thumbnailHeight);
+  }
+
+  return height;
 }
 
 function measureMarkup(markup: Markup[]): number {
-  return markup
-    .map((node) => {
-      switch (node.type) {
-        case 'style':
-          return measureMarkup(node.children);
-
-        case 'text':
-          return Math.floor((8 * node.text.length) / Math.min(800, window.innerWidth));
-
-        case 'newline':
-          return 1;
-
-        default:
-          return 0;
-      }
-    })
-    .reduce((prev: number, curr) => prev + curr, 0);
+  return (1 + estimateMarkupLines(markup)) * POST_MESSAGE_LINE_HEIGHT;
 }
 
-export function PostList({ posts }: PostListProps) {
+function estimateMarkupLines(markup: Markup[]): number {
+  let height = 0;
+  for (const node of markup) {
+    switch (node.type) {
+      case 'style':
+        height += estimateMarkupLines(node.children);
+        break;
+
+      case 'text':
+        height += Math.floor((8 * node.text.length) / Math.min(800, window.innerWidth));
+        break;
+
+      case 'newline':
+        height += 1;
+        break;
+    }
+  }
+
+  return height;
+}
+
+export function PostList({ className, posts }: PostListProps) {
   const postHeightCache = useRef(new Map<number, number>());
-
-  useEffect(() => {
-    const handler = () => postHeightCache.current.clear();
-    window.addEventListener('resize', handler, { passive: true });
-    return () => window.removeEventListener('resize', handler);
-  });
-
   const estimateSize = useCallback(
     (index: number) => {
-      if (postHeightCache.current.has(index)) {
-        return postHeightCache.current.get(index)!;
+      const cachedHeight = postHeightCache.current.get(index);
+      if (typeof cachedHeight !== 'undefined') {
+        return cachedHeight;
       }
 
       const height = measurePost(posts[index]);
@@ -121,7 +127,7 @@ export function PostList({ posts }: PostListProps) {
   }, []);
 
   return (
-    <div className="post-list">
+    <div className={[className, 'post-list'].join()}>
       <div className="post-list__inner" style={{ height: `${virtualizer.getTotalSize()}px` }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
           <div

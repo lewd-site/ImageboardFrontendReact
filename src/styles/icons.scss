@@ -1,0 +1,25 @@
+.icon {
+  $icons: 'add', 'anime', 'attach', 'check', 'cinema', 'close', 'desktop', 'directory', 'discussion', 'dots', 'down',
+    'dots-vertical', 'download', 'hash', 'home', 'image', 'left', 'link', 'menu', 'message', 'mobile', 'notification',
+    'profile', 'password', 'pin', 'reply-message', 'reply', 'right', 'settings', 'submit', 'unpin', 'up', 'user',
+    'zoom-in', 'zoom-out';
+
+  display: inline-block;
+
+  background-color: currentColor;
+
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+
+  width: 1em;
+  height: 1em;
+
+  transition: color 100ms ease, background-color 100ms ease;
+
+  @each $icon in $icons {
+    &_#{$icon} {
+      mask-image: url('./icons/#{$icon}.svg');
+    }
+  }
+}

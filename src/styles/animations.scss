@@ -1,0 +1,15 @@
+$offset: 7.8%;
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) translateY($offset);
+  }
+
+  50% {
+    transform: rotate(180deg) translateY($offset);
+  }
+
+  100% {
+    transform: rotate(360deg) translateY($offset);
+  }
+}

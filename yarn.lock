@@ -32,7 +32,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.7.6":
+"@babel/runtime@npm:^7.16.7, @babel/runtime@npm:^7.7.6":
   version: 7.18.3
   resolution: "@babel/runtime@npm:7.18.3"
   dependencies:
@@ -980,21 +980,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/react-virtual@npm:beta":
-  version: 3.0.0-beta.1
-  resolution: "@tanstack/react-virtual@npm:3.0.0-beta.1"
+"@tanstack/react-location@npm:^3.7.4":
+  version: 3.7.4
+  resolution: "@tanstack/react-location@npm:3.7.4"
   dependencies:
-    "@reach/observe-rect": ^1.1.0
-  checksum: aaca6a7463f559b3a93135217ea8f2ea6c08d32b18188a4769126d2e536d67c280bed524f021256e96336979e930b6629f1aae6547fd58f28c8577b7d9d2a188
+    "@babel/runtime": ^7.16.7
+    history: ^5.2.0
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 54dfa1c7d9f1be080ec63f392bb8f3e724ef194e8a6b3b044328efd1917913fbf27ce7e18af3e6a2eabd6fa7741e1242a4ea1fdd259aebee8ff8b9eaf6f2893e
   languageName: node
   linkType: hard
 
-"@tanstack/virtual-core@npm:beta":
-  version: 3.0.0-beta.1
-  resolution: "@tanstack/virtual-core@npm:3.0.0-beta.1"
+"@tanstack/react-virtual@npm:^3.0.0-alpha.0":
+  version: 3.0.0-beta.2
+  resolution: "@tanstack/react-virtual@npm:3.0.0-beta.2"
   dependencies:
     "@reach/observe-rect": ^1.1.0
-  checksum: f9c483ef87ee581bd70b3f82b9786034e3b5e9e9062d883e4e69484e2be3d42d26609dc2d41d3e1ff94731adf1b9af7023f1bbbc16e185f1af0ffcaed99053af
+  checksum: 3fe623dd96603a47d4e7ebbd3f47e9e3aaa95ba36d6c94b6e4f14ff1de006b51d0afb79b80f388908d3caaace589f8c105e0824296e6094dd29fa1b4d5a63c3c
+  languageName: node
+  linkType: hard
+
+"@tanstack/virtual-core@npm:^3.0.0-alpha.1":
+  version: 3.0.0-beta.2
+  resolution: "@tanstack/virtual-core@npm:3.0.0-beta.2"
+  dependencies:
+    "@reach/observe-rect": ^1.1.0
+  checksum: 712124a0ca1e6cde813400eca4f449577c8f0c2c8c43318286166ffcccb4d5fe00f3186033ea8fc14505b826021241109fbe92ea259fe735948c072b7e55f46a
   languageName: node
   linkType: hard
 
@@ -1009,13 +1022,6 @@ __metadata:
   version: 0.2.0
   resolution: "@trysound/sax@npm:0.2.0"
   checksum: 11226c39b52b391719a2a92e10183e4260d9651f86edced166da1d95f39a0a1eaa470e44d14ac685ccd6d3df7e2002433782872c0feeb260d61e80f21250e65c
-  languageName: node
-  linkType: hard
-
-"@types/history@npm:^4.7.11":
-  version: 4.7.11
-  resolution: "@types/history@npm:4.7.11"
-  checksum: c92e2ba407dcab0581a9afdf98f533aa41b61a71133420a6d92b1ca9839f741ab1f9395b17454ba5b88cb86020b70b22d74a1950ccfbdfd9beeaa5459fdc3464
   languageName: node
   linkType: hard
 
@@ -1046,27 +1052,6 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: cd48b81950f499b52a3f0c08261f00046f9b7c96699fa249c9664e257e820daf6ecac815cd1028cebc9d105094adc39d047d1efd79214394b8b2d515574c0787
-  languageName: node
-  linkType: hard
-
-"@types/react-router-dom@npm:^5.3.3":
-  version: 5.3.3
-  resolution: "@types/react-router-dom@npm:5.3.3"
-  dependencies:
-    "@types/history": ^4.7.11
-    "@types/react": "*"
-    "@types/react-router": "*"
-  checksum: 28c4ea48909803c414bf5a08502acbb8ba414669b4b43bb51297c05fe5addc4df0b8fd00e0a9d1e3535ec4073ef38aaafac2c4a2b95b787167d113bc059beff3
-  languageName: node
-  linkType: hard
-
-"@types/react-router@npm:*":
-  version: 5.1.18
-  resolution: "@types/react-router@npm:5.1.18"
-  dependencies:
-    "@types/history": ^4.7.11
-    "@types/react": "*"
-  checksum: f08b37ee822f9f9ff904ffd0778fe2bb7c717ed3ee311610382ee024d02a35169bd3301ecde863cac21aae8fdee919501e8ea22bad0260c02c10cfbdba5c71be
   languageName: node
   linkType: hard
 
@@ -2018,22 +2003,22 @@ __metadata:
   dependencies:
     "@parcel/core": ^2.6.0
     "@parcel/transformer-sass": ^2.5.0
-    "@tanstack/react-virtual": beta
-    "@tanstack/virtual-core": beta
+    "@tanstack/react-location": ^3.7.4
+    "@tanstack/react-virtual": ^3.0.0-alpha.0
+    "@tanstack/virtual-core": ^3.0.0-alpha.1
     "@types/node": ^17.0.35
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.5
-    "@types/react-router-dom": ^5.3.3
     cssnano: ^5.1.9
     normalize.css: ^8.0.1
     parcel: ^2.5.0
+    parcel-resolver-ignore: ^2.1.1
     postcss: ^8.4.14
     postcss-sort-media-queries: ^4.2.1
     process: ^0.11.10
     prop-types: ^15.8.1
     react: ^18.1.0
     react-dom: ^18.1.0
-    react-router-dom: ^6.3.0
     sass: ^1.52.1
     typescript: ^4.7.2
   languageName: unknown
@@ -2700,6 +2685,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parcel-resolver-ignore@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "parcel-resolver-ignore@npm:2.1.1"
+  checksum: 33aa263cdfc3a18ed208560fbdf0acd943d5bd264803b73eb4ae233e41009514d95f77e23de08591bf4acbeadc6357b64c028a43cfb89260b1f93c3b78e6bfad
+  languageName: node
+  linkType: hard
+
 "parcel@npm:^2.5.0":
   version: 2.6.0
   resolution: "parcel@npm:2.6.0"
@@ -3219,30 +3211,6 @@ __metadata:
   version: 0.9.0
   resolution: "react-refresh@npm:0.9.0"
   checksum: 6440146176f19402ffb7d66f317e40b1c42c88579b4d439b49021e38be6307c642da3e8732a72e6997b6bb1127db0da92f4aa433da4313ce8ebad0c1efa2ed4a
-  languageName: node
-  linkType: hard
-
-"react-router-dom@npm:^6.3.0":
-  version: 6.3.0
-  resolution: "react-router-dom@npm:6.3.0"
-  dependencies:
-    history: ^5.2.0
-    react-router: 6.3.0
-  peerDependencies:
-    react: ">=16.8"
-    react-dom: ">=16.8"
-  checksum: 77603a654f8a8dc7f65535a2e5917a65f8d9ffcb06546d28dd297e52adcc4b8a84377e0115f48dca330b080af2da3e78f29d590c89307094d36927d2b1751ec3
-  languageName: node
-  linkType: hard
-
-"react-router@npm:6.3.0":
-  version: 6.3.0
-  resolution: "react-router@npm:6.3.0"
-  dependencies:
-    history: ^5.2.0
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 7be673f5e72104be01e6ab274516bdb932efd93305243170690f6560e3bd1035dd1df3d3c9ce1e0f452638a2529f43a1e77dcf0934fc8031c4783da657be13ca
   languageName: node
   linkType: hard
 

@@ -1,22 +1,19 @@
 .post-list {
-  padding: 8px;
-
   &__inner {
     position: relative;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
   }
 
   &__item-wrapper {
     position: absolute;
     top: 0;
     left: 0;
+
     width: 100%;
   }
 
   &__item {
-    border-left: 2px solid rgba(#eee, 0.5);
+    border-left: 2px solid rgba($foreground, 0.5);
+
     padding-left: 8px;
     margin-bottom: 16px;
   }

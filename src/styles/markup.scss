@@ -1,0 +1,50 @@
+strong,
+.bold {
+  font-weight: bold;
+}
+
+em,
+.italic {
+  font-style: italic;
+}
+
+del,
+.strike {
+  text-decoration: line-through;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.spoiler {
+  background: rgba(0, 0, 0, 0.1);
+  color: transparent;
+  border-radius: 4px;
+  padding: 0 2px;
+  transition: color 200ms ease;
+
+  &:hover {
+    color: var(--foreground);
+  }
+}
+
+a,
+.link,
+.reflink,
+.quote {
+  color: var(--primary);
+}
+
+a,
+.link,
+.reflink {
+  text-decoration: underline;
+}
+
+code,
+.code {
+  font-family: 'Fira Code', monospace;
+  white-space: pre;
+  word-break: break-all;
+}

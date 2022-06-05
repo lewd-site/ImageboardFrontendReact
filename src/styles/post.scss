@@ -19,7 +19,7 @@
 
   &__date {
     font-size: 0.875em;
-    opacity: 0.75;
+    opacity: 0.8;
 
     margin-right: 8px;
   }
@@ -27,6 +27,8 @@
   &__id {
     font-size: 0.875em;
     opacity: 0.8;
+
+    margin-right: 8px;
 
     &::before {
       content: '#';

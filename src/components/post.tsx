@@ -3,6 +3,8 @@ import { Post as PostModel, File as FileModel } from '../domain';
 import { Markup } from './markup';
 import { File } from './file';
 
+const DEFAULT_NAME = 'Anonymous';
+
 interface PostProps {
   readonly className?: string;
   readonly post: PostModel;
@@ -11,7 +13,7 @@ interface PostProps {
 }
 
 export function Post({ className, post, onReflinkClick, onThumbnailClick }: PostProps) {
-  const name = !post.name.length && !post.tripcode.length ? 'Anonymous' : post.name;
+  const name = !post.name.length && !post.tripcode.length ? DEFAULT_NAME : post.name;
   const files = useMemo(
     () => post.files.map((file, index) => <File file={file} key={index} onThumbnailClick={onThumbnailClick} />),
     [post.files, onThumbnailClick]

@@ -1,0 +1,38 @@
+.layout {
+  $headerHeight: 40px;
+  $sidebarWidth: 200px;
+  $contentWidth: 800px;
+
+  &__header {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    background: var(--background);
+
+    width: 100%;
+    height: $headerHeight;
+
+    z-index: 1000;
+  }
+
+  &__sidebar {
+    position: fixed;
+    top: $headerHeight;
+    left: calc(50vw - $contentWidth / 2 - $sidebarWidth);
+
+    width: $sidebarWidth;
+    height: calc(100vh - $headerHeight);
+
+    z-index: 900;
+  }
+
+  &__content {
+    width: 100%;
+    max-width: $contentWidth;
+
+    min-height: calc(100vh - $headerHeight);
+
+    margin: $headerHeight auto 0;
+  }
+}

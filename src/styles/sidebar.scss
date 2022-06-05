@@ -1,0 +1,48 @@
+.sidebar {
+  &__list,
+  &__item {
+    list-style: none;
+
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+  }
+
+  &__link {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    border-radius: 50px;
+
+    background-color: none;
+    color: var(--foreground);
+
+    font-size: 18px;
+    font-weight: 700;
+    text-decoration: none;
+
+    padding: 4px 12px;
+
+    transition: background-color 100ms ease;
+
+    .icon {
+      color: #9da2b2;
+
+      margin-right: 8px;
+    }
+
+    &.active,
+    &:hover {
+      background-color: #303339;
+
+      .icon {
+        color: var(--primary);
+      }
+    }
+  }
+}

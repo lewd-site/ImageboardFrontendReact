@@ -5,15 +5,32 @@
   "private": true,
   "source": "src/index.html",
   "browserslist": "> 0.5%, last 2 versions, not dead",
+  "parcelIgnore": [
+    "android-chrome-192x192.png",
+    "android-chrome-512x512.png",
+    "apple-touch-icon.png",
+    "browserconfig.xml",
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon.ico",
+    "mstile-144x144.png",
+    "mstile-150x150.png",
+    "mstile-310x150.png",
+    "mstile-310x310.png",
+    "mstile-70x70.png",
+    "robots.txt",
+    "safari-pinned-tab.svg",
+    "site.webmanifest"
+  ],
   "devDependencies": {
     "@parcel/core": "^2.6.0",
     "@parcel/transformer-sass": "^2.5.0",
     "@types/node": "^17.0.35",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
-    "@types/react-router-dom": "^5.3.3",
     "cssnano": "^5.1.9",
     "parcel": "^2.5.0",
+    "parcel-resolver-ignore": "^2.1.1",
     "postcss": "^8.4.14",
     "postcss-sort-media-queries": "^4.2.1",
     "process": "^0.11.10",
@@ -21,13 +38,13 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
-    "@tanstack/react-virtual": "beta",
-    "@tanstack/virtual-core": "beta",
+    "@tanstack/react-location": "^3.7.4",
+    "@tanstack/react-virtual": "^3.0.0-alpha.0",
+    "@tanstack/virtual-core": "^3.0.0-alpha.1",
     "normalize.css": "^8.0.1",
     "prop-types": "^15.8.1",
     "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-router-dom": "^6.3.0"
+    "react-dom": "^18.1.0"
   },
   "scripts": {
     "start": "parcel",

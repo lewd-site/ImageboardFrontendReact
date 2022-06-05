@@ -26,7 +26,7 @@ interface FileDto {
 interface ThreadDto {
   readonly slug: string;
   readonly id: number;
-  readonly subject: string;
+  readonly subject: string | null;
   readonly name: string | null;
   readonly tripcode: string | null;
   readonly files: FileDto[];
@@ -81,7 +81,7 @@ function isThreadDto(thread: any): thread is ThreadDto {
   return (
     typeof thread.slug === 'string' &&
     typeof thread.id === 'number' &&
-    typeof thread.subject === 'string' &&
+    (('subject' in thread && thread.subject === null) || typeof thread.subject === 'string') &&
     (('name' in thread && thread.name === null) || typeof thread.name === 'string') &&
     (('tripcode' in thread && thread.tripcode === null) || typeof thread.tripcode === 'string') &&
     'files' in thread &&
@@ -174,7 +174,7 @@ function convertThreadDtoToThread(thread: ThreadDto): Thread {
   return {
     slug: thread.slug,
     id: thread.id,
-    subject: thread.subject,
+    subject: thread.subject !== null ? thread.subject : '',
     name: thread.name !== null ? thread.name : '',
     tripcode: thread.tripcode !== null ? thread.tripcode : '',
     files: thread.files.map(convertFileDtoToFile),
