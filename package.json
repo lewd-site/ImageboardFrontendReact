@@ -29,6 +29,7 @@
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
     "@types/react-modal": "^3.13.1",
+    "@types/react-rnd": "^8.0.0",
     "cssnano": "^5.1.9",
     "parcel": "^2.5.0",
     "parcel-resolver-ignore": "^2.1.1",
@@ -46,7 +47,7 @@
     "prop-types": "^15.8.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "react-modal": "^3.15.1"
+    "react-rnd": "^10.3.7"
   },
   "scripts": {
     "start": "parcel",

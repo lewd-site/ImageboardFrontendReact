@@ -6,11 +6,19 @@ export type Listener = (newPosts: Post[]) => void;
 export type Unsubscribe = () => void;
 
 export interface ThreadUpdater {
+  set lastPostId(value: number);
+
   subscribe(listener: Listener): Unsubscribe;
   dispose(): void;
 }
 
 export abstract class ThreadUpdaterBase implements ThreadUpdater {
+  protected _lastPostId = 0;
+
+  public set lastPostId(value: number) {
+    this._lastPostId = value;
+  }
+
   protected readonly _listeners: Listener[] = [];
 
   public subscribe(listener: Listener): Unsubscribe {
@@ -31,7 +39,6 @@ export abstract class ThreadUpdaterBase implements ThreadUpdater {
 
 export class IntervalPoolingThreadUpdater extends ThreadUpdaterBase {
   protected readonly _interval: any;
-  protected _lastPostId = 0;
 
   public constructor(
     public readonly slug: string,
@@ -62,7 +69,6 @@ export class IntervalPoolingThreadUpdater extends ThreadUpdaterBase {
 export class SseThreadUpdater extends ThreadUpdaterBase {
   protected readonly _interval: any;
   protected _eventSource: EventSource | null = null;
-  protected _lastPostId = 0;
 
   public constructor(
     public readonly slug: string,

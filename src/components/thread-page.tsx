@@ -4,6 +4,7 @@ import { Post } from '../domain';
 import { LocationGenerics } from '../types';
 import { SseThreadUpdater } from '../updater';
 import { PostList } from './post-list';
+import { PostingFormModal } from './posting-form-modal';
 
 export function ThreadPage() {
   const [posts, setPosts] = useState<Map<number, Post>>(new Map());
@@ -48,5 +49,12 @@ export function ThreadPage() {
   }, [slug, parentId]);
 
   const postList = useMemo(() => <PostList className="thread-page__posts" posts={[...posts.values()]} />, [posts]);
-  return <div className="thread-page">{postList}</div>;
+  const postingFormModal = useMemo(() => <PostingFormModal slug={slug} parentId={parentId} />, [slug, parentId]);
+
+  return (
+    <div className="thread-page">
+      {postList}
+      {postingFormModal}
+    </div>
+  );
 }

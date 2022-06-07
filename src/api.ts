@@ -247,3 +247,21 @@ export async function browsePosts(slug: string, parentId: number): Promise<Post[
     return convertPostDtoToPost(item);
   });
 }
+
+export async function createPost(slug: string, parentId: number, name: string, message: string): Promise<Post> {
+  const body = new FormData();
+  body.append('name', name);
+  body.append('message', message);
+
+  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads/${parentId}/posts`, {
+    method: 'POST',
+    body,
+  });
+
+  const { item } = await response.json();
+  if (!isPostDto(item)) {
+    throw new ApiError(`Invalid post DTO: ${JSON.stringify(item)}`);
+  }
+
+  return convertPostDtoToPost(item);
+}

@@ -1,5 +1,6 @@
 .layout {
   $headerHeight: 40px;
+  $headerMargin: 8px;
   $sidebarWidth: 200px;
   $contentWidth: 800px;
 
@@ -9,6 +10,7 @@
     left: 0;
 
     background: var(--background);
+    box-shadow: 0 0 8px 0 rgba(#000, 0.1);
 
     width: 100%;
     height: $headerHeight;
@@ -18,11 +20,11 @@
 
   &__sidebar {
     position: fixed;
-    top: $headerHeight;
+    top: ($headerHeight + $headerMargin);
     left: calc(50vw - $contentWidth / 2 - $sidebarWidth);
 
     width: $sidebarWidth;
-    height: calc(100vh - $headerHeight);
+    height: calc(100vh - $headerHeight - $headerMargin);
 
     z-index: 900;
   }
@@ -31,8 +33,8 @@
     width: 100%;
     max-width: $contentWidth;
 
-    min-height: calc(100vh - $headerHeight);
+    min-height: calc(100vh - $headerHeight - $headerMargin);
 
-    margin: $headerHeight auto 0;
+    margin: ($headerHeight + $headerMargin) auto 0;
   }
 }

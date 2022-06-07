@@ -7,4 +7,8 @@ export type LocationGenerics = MakeGenerics<{
     threads: Thread[];
     posts: Post[];
   };
+
+  RouteMeta: {
+    name: string;
+  };
 }>;

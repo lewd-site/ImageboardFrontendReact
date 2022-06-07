@@ -23,8 +23,8 @@ applySettings(settings);
 
 document.addEventListener(
   'keydown',
-  (e) => {
-    if (e.code === 'KeyB') {
+  (event) => {
+    if (event.code === 'KeyB') {
       settings.nsfw = !settings.nsfw;
     }
   },
@@ -52,6 +52,9 @@ function createApp() {
           pendingElement: <Spinner />,
           pendingMs: 100,
           pendingMinMs: 100,
+          meta: {
+            name: 'index',
+          },
         },
         {
           path: ':slug',
@@ -66,6 +69,9 @@ function createApp() {
               pendingElement: <Spinner />,
               pendingMs: 100,
               pendingMinMs: 100,
+              meta: {
+                name: 'board',
+              },
             },
             {
               path: 'res/:parentId',
@@ -77,6 +83,9 @@ function createApp() {
               pendingElement: <Spinner />,
               pendingMs: 100,
               pendingMinMs: 100,
+              meta: {
+                name: 'thread',
+              },
             },
           ],
         },
