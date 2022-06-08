@@ -1,5 +1,6 @@
 import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo } from 'react';
 import { createPost } from '../api';
+import { FileInput } from './file-input';
 
 interface PostingFormProps {
   readonly className?: string;
@@ -9,6 +10,9 @@ interface PostingFormProps {
 
 const NAME = 'posting-form.name';
 const MESSAGE = 'posting-form.message';
+
+const MAX_NAME_LEGTH = 100;
+const MAX_MESSAGE_LENGTH = 8000;
 
 export function PostingForm({ className, slug, parentId }: PostingFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -33,6 +37,7 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
 
   const name = useRef(defaultName);
   const message = useRef(defaultMessage);
+  const files = useRef<File[]>([]);
 
   const onNameChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     name.current = event.target.value;
@@ -44,6 +49,8 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
     localStorage.setItem(MESSAGE, message.current);
   }, []);
 
+  const onFilesChange = useCallback((value: File[]) => (files.current = value), []);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<any>(null);
 
@@ -54,10 +61,25 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
       setError(null);
 
       try {
-        await createPost(slug, parentId, name.current, message.current);
+        await createPost(slug, parentId, name.current, message.current, files.current);
 
-        formRef.current!.querySelector<HTMLTextAreaElement>('[name="message"]')!.value = '';
         message.current = '';
+        files.current = [];
+
+        if (formRef.current !== null) {
+          const messageElement = formRef.current.querySelector<HTMLTextAreaElement>('[name="message"]');
+          if (messageElement !== null) {
+            messageElement.value = '';
+          }
+
+          const filesElement = formRef.current.querySelector<HTMLInputElement>('[name="files"]');
+          if (filesElement !== null) {
+            filesElement.type = 'text';
+            filesElement.value = '';
+            filesElement.type = 'file';
+          }
+        }
+
         localStorage.setItem(MESSAGE, message.current);
       } catch (e) {
         setError(e);
@@ -75,12 +97,12 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
           className="posting-form__name"
           name="name"
           placeholder="Имя"
-          maxLength={100}
+          maxLength={MAX_NAME_LEGTH}
           defaultValue={defaultName}
           onChange={onNameChange}
         />
 
-        <button type="submit" className="posting-form__submit">
+        <button type="submit" className="posting-form__submit" title="Отправить">
           <span className="icon icon_submit"></span>
         </button>
       </div>
@@ -89,10 +111,12 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
         className="posting-form__message"
         name="message"
         placeholder="Сообщение"
-        maxLength={8000}
+        maxLength={MAX_MESSAGE_LENGTH}
         defaultValue={defaultMessage}
         onChange={onMessageChange}
       ></textarea>
+
+      <FileInput className="posting-form__files-row" onChange={onFilesChange} />
     </form>
   );
 }

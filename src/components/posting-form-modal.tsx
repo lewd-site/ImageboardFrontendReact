@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { DraggableData, Position, Rnd } from 'react-rnd';
+import { CSSTransition } from 'react-transition-group';
 import { eventBus } from '../event-bus';
 import { SHOW_POST_FORM } from '../events';
 import { PostingForm } from './posting-form';
@@ -15,19 +16,19 @@ const POSTING_FORM_WIDTH = 'posting-form.width';
 const POSTING_FORM_HEIGHT = 'posting-form.height';
 
 const MODAL_MIN_WIDTH = 400;
-const MODAL_MIN_HEIGHT = 200;
+const MODAL_MIN_HEIGHT = 250;
 
 export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
-  const [postFormVisible, setPostFormVisible] = useState(false);
+  const [modalTransition, setModalTransition] = useState(false);
   useEffect(() => {
     function handler() {
-      setPostFormVisible(true);
+      setModalTransition(true);
     }
 
     return eventBus.subscribe(SHOW_POST_FORM, handler);
   }, []);
 
-  const onCloseClick = useCallback(() => setPostFormVisible(false), []);
+  const onCloseClick = useCallback(() => setModalTransition(false), []);
 
   const [position, setPosition] = useState(() => {
     const width = Number(localStorage.getItem(POSTING_FORM_WIDTH) || MODAL_MIN_WIDTH);
@@ -63,32 +64,48 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
     localStorage.setItem(POSTING_FORM_HEIGHT, ref.offsetHeight.toString());
   }, []);
 
-  if (!postFormVisible) {
-    return null;
-  }
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  const [modalVisible, setModalVisible] = useState(true);
+  useEffect(() => setModalVisible(false), []);
+
+  const onEnter = useCallback(() => setModalVisible(true), []);
+  const onExited = useCallback(() => setModalVisible(false), []);
 
   return (
-    <div className="modal-overlay">
-      <Rnd
-        className="modal"
-        bounds="parent"
-        minWidth={MODAL_MIN_WIDTH}
-        minHeight={MODAL_MIN_HEIGHT}
-        position={position}
-        size={size}
-        onDragStop={onDragStop}
-        onResizeStop={onResizeStop}
+    <CSSTransition
+      in={modalTransition}
+      timeout={200}
+      classNames="modal-overlay"
+      nodeRef={nodeRef}
+      onEnter={onEnter}
+      onExited={onExited}
+    >
+      <div
+        className={['modal-overlay', modalVisible ? 'modal-overlay_visible' : 'modal-overlay_hidden'].join(' ')}
+        ref={nodeRef}
       >
-        <div className="modal__header">
-          <h3 className="modal__title">Ответ в тред #{parentId}</h3>
+        <Rnd
+          className="modal"
+          bounds="parent"
+          minWidth={MODAL_MIN_WIDTH}
+          minHeight={MODAL_MIN_HEIGHT}
+          position={position}
+          size={size}
+          onDragStop={onDragStop}
+          onResizeStop={onResizeStop}
+        >
+          <div className="modal__header">
+            <h3 className="modal__title">Ответ в тред #{parentId}</h3>
 
-          <button type="button" className="modal__close" onClick={onCloseClick}>
-            <span className="icon icon_close"></span>
-          </button>
-        </div>
+            <button type="button" className="modal__close" title="Закрыть" onClick={onCloseClick}>
+              <span className="icon icon_close"></span>
+            </button>
+          </div>
 
-        <PostingForm className="modal__body" slug={slug} parentId={parentId} />
-      </Rnd>
-    </div>
+          <PostingForm className="modal__body" slug={slug} parentId={parentId} />
+        </Rnd>
+      </div>
+    </CSSTransition>
   );
 }

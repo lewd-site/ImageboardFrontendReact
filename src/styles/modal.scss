@@ -6,9 +6,33 @@
   bottom: 0;
   right: 0;
 
+  opacity: 0;
   pointer-events: none;
 
   z-index: 1100;
+
+  &_hidden {
+    display: none;
+  }
+
+  &-enter {
+    opacity: 0;
+  }
+
+  &-enter-active {
+    opacity: 1;
+    transition: opacity 200ms ease;
+  }
+
+  &-enter-done,
+  &-exit {
+    opacity: 1;
+  }
+
+  &-exit-active {
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
 }
 
 .modal {

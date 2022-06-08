@@ -15,6 +15,9 @@
   width: 1em;
   height: 1em;
 
+  min-width: 1em;
+  min-height: 1em;
+
   transition: color 100ms ease, background-color 100ms ease;
 
   @each $icon in $icons {

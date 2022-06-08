@@ -1,5 +1,5 @@
 import config from './config';
-import { Board, Markup, File, Thread, Post } from './domain';
+import { Board, Markup, Thread, Post, File as FileModel } from './domain';
 
 export class ApiError extends Error {}
 
@@ -122,7 +122,7 @@ export function convertBoardDtoToBoard(board: BoardDto): Board {
   };
 }
 
-export function convertFileDtoToFile(file: FileDto): File {
+export function convertFileDtoToFile(file: FileDto): FileModel {
   return {
     hash: file.hash,
     extension: file.extension,
@@ -248,10 +248,19 @@ export async function browsePosts(slug: string, parentId: number): Promise<Post[
   });
 }
 
-export async function createPost(slug: string, parentId: number, name: string, message: string): Promise<Post> {
+export async function createPost(
+  slug: string,
+  parentId: number,
+  name: string,
+  message: string,
+  files: File[]
+): Promise<Post> {
   const body = new FormData();
   body.append('name', name);
   body.append('message', message);
+  for (const file of files) {
+    body.append('files', file, file.name);
+  }
 
   const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads/${parentId}/posts`, {
     method: 'POST',
