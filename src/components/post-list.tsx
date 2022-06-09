@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 import { Post as PostModel, File as FileModel, Markup } from '../domain';
 import { Post } from './post';
@@ -126,6 +126,34 @@ export function PostList({ className, posts }: PostListProps) {
     console.log(file);
   }, []);
 
+  const onScrollTop = useCallback(() => {
+    virtualizer.scrollToIndex(0, { align: 'end' });
+  }, []);
+
+  const onScrollBottom = useCallback(() => {
+    virtualizer.scrollToIndex(posts.length, { align: 'start' });
+  }, [posts]);
+
+  const [scrollTopVisible, setScrollTopVisible] = useState(false);
+  const [scrollBottomVisible, setScrollBottomVisible] = useState(true);
+
+  useEffect(() => {
+    function handler() {
+      const { scrollingElement } = document;
+      if (scrollingElement === null) {
+        return;
+      }
+
+      setScrollTopVisible(scrollingElement.scrollTop > 0.5 * scrollingElement.clientHeight);
+      setScrollBottomVisible(
+        scrollingElement.scrollTop < scrollingElement.scrollHeight - 1.5 * scrollingElement.clientHeight
+      );
+    }
+
+    window.addEventListener('scroll', handler, { passive: true });
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
   return (
     <div className={[className, 'post-list'].join(' ')}>
       <div className="post-list__inner" style={{ height: `${virtualizer.getTotalSize()}px` }}>
@@ -145,6 +173,28 @@ export function PostList({ className, posts }: PostListProps) {
           </div>
         ))}
       </div>
+
+      <button
+        type="button"
+        className={[
+          'layout__scroll-top',
+          scrollTopVisible ? 'layout__scroll-top_visible' : 'layout__scroll-top_hidden',
+        ].join(' ')}
+        onClick={onScrollTop}
+      >
+        <span className="icon icon_up"></span>
+      </button>
+
+      <button
+        type="button"
+        className={[
+          'layout__scroll-bottom',
+          scrollBottomVisible ? 'layout__scroll-bottom_visible' : 'layout__scroll-bottom_hidden',
+        ].join(' ')}
+        onClick={onScrollBottom}
+      >
+        <span className="icon icon_down"></span>
+      </button>
     </div>
   );
 }
