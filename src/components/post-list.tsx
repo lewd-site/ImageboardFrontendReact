@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
-import { Post as PostModel, File as FileModel, Markup } from '../domain';
+import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
+import { Lightbox } from './lightbox';
 
 interface Rect {
   readonly width: number;
@@ -122,10 +123,6 @@ export function PostList({ className, posts }: PostListProps) {
     [posts]
   );
 
-  const onThumbnailClick = useCallback((file: FileModel) => {
-    console.log(file);
-  }, []);
-
   const onScrollTop = useCallback(() => {
     virtualizer.scrollToIndex(0, { align: 'end' });
   }, []);
@@ -153,6 +150,30 @@ export function PostList({ className, posts }: PostListProps) {
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  const [lightboxVisible, setLightboxVisible] = useState<boolean>(false);
+  const [file, setFile] = useState<FileModel | null>(null);
+
+  const onThumbnailClick = useCallback(
+    (newFile: FileModel) => {
+      setFile((file) => {
+        if (lightboxVisible && file === newFile) {
+          setLightboxVisible(false);
+          return file;
+        }
+
+        setTimeout(() => {
+          setLightboxVisible(true);
+          setFile(newFile);
+        });
+
+        return file?.originalUrl === newFile.originalUrl ? file : null;
+      });
+    },
+    [lightboxVisible]
+  );
+
+  const onLightboxClose = useCallback(() => setLightboxVisible(false), []);
 
   return (
     <div className={[className, 'post-list'].join(' ')}>
@@ -195,6 +216,8 @@ export function PostList({ className, posts }: PostListProps) {
       >
         <span className="icon icon_down"></span>
       </button>
+
+      <Lightbox visible={lightboxVisible} file={file} onClose={onLightboxClose} />
     </div>
   );
 }
