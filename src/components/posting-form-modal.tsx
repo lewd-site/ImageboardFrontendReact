@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { DraggableData, Position, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { eventBus } from '../event-bus';
@@ -17,6 +17,8 @@ const POSTING_FORM_HEIGHT = 'posting-form.height';
 
 const MODAL_MIN_WIDTH = 400;
 const MODAL_MIN_HEIGHT = 250;
+
+const MOBILE_MAX_WIDTH = 600;
 
 export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
   const [modalTransition, setModalTransition] = useState(false);
@@ -72,6 +74,22 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
   const onEnter = useCallback(() => setModalVisible(true), []);
   const onExited = useCallback(() => setModalVisible(false), []);
 
+  const postingForm = useMemo(
+    () => <PostingForm className="modal__body" slug={slug} parentId={parentId} />,
+    [slug, parentId]
+  );
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_MAX_WIDTH);
+
+  useEffect(() => {
+    function handler() {
+      setIsMobile(window.innerWidth < MOBILE_MAX_WIDTH);
+    }
+
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
   return (
     <CSSTransition
       in={modalTransition}
@@ -94,6 +112,7 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
           size={size}
           onDragStop={onDragStop}
           onResizeStop={onResizeStop}
+          disableDragging={isMobile}
         >
           <div className="modal__header">
             <h3 className="modal__title">Ответ в тред #{parentId}</h3>
@@ -103,7 +122,7 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
             </button>
           </div>
 
-          <PostingForm className="modal__body" slug={slug} parentId={parentId} />
+          {postingForm}
         </Rnd>
       </div>
     </CSSTransition>

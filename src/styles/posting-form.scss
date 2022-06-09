@@ -2,6 +2,7 @@
   display: flex;
   flex-flow: column nowrap;
 
+  touch-action: none;
   cursor: initial;
 
   &__name-row {

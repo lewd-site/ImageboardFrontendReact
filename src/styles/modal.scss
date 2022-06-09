@@ -92,3 +92,15 @@
     flex: 1;
   }
 }
+
+@media screen and (max-width: 600px) {
+  .modal {
+    transform: none !important;
+
+    width: 100% !important;
+    min-width: unset !important;
+
+    height: 100% !important;
+    min-height: unset !important;
+  }
+}

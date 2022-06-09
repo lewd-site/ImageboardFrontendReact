@@ -46,7 +46,14 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
         </span>
       </div>
 
-      <div className="post__files">{files}</div>
+      <div
+        className={[
+          'post__files',
+          files.length === 1 ? 'post__files_single' : files.length > 1 ? 'post__files_multiple' : '',
+        ].join(' ')}
+      >
+        {files}
+      </div>
       <div className="post__message">{markup}</div>
     </div>
   );
