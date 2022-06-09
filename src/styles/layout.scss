@@ -20,13 +20,44 @@
 
   &__sidebar {
     position: fixed;
-    top: ($headerHeight + $headerMargin);
-    left: calc(50vw - $contentWidth / 2 - $sidebarWidth);
 
-    width: $sidebarWidth;
-    height: calc(100vh - $headerHeight - $headerMargin);
+    top: 0;
+    left: -100vw;
 
-    z-index: 900;
+    width: 100vw;
+    height: 100vh;
+
+    background: var(--background);
+
+    padding: 16px;
+
+    transition: left 200ms ease;
+
+    z-index: 1200;
+
+    &_visible {
+      left: 0;
+    }
+
+    @media screen and (min-width: 600px) {
+      box-shadow: 0 0 8px 0 rgba(#000, 0.1);
+
+      width: 600px;
+    }
+
+    @media screen and (min-width: 1200px) {
+      box-shadow: none;
+
+      top: ($headerHeight + $headerMargin);
+      left: calc(50vw - $contentWidth / 2 - $sidebarWidth);
+
+      width: $sidebarWidth;
+      height: calc(100vh - $headerHeight - $headerMargin);
+
+      padding: 0;
+
+      z-index: 900;
+    }
   }
 
   &__content {
@@ -35,6 +66,7 @@
 
     min-height: calc(100vh - $headerHeight - $headerMargin);
 
+    padding: 0 16px;
     margin: ($headerHeight + $headerMargin) auto 0;
   }
 }

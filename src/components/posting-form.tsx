@@ -54,6 +54,10 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<any>(null);
 
+  const messageRef = useRef<HTMLTextAreaElement>(null);
+  const clearFileInput = useRef(() => {});
+  const setClearFileInput = useCallback((clear: () => void) => (clearFileInput.current = clear), []);
+
   const onSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
@@ -66,19 +70,11 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
         message.current = '';
         files.current = [];
 
-        if (formRef.current !== null) {
-          const messageElement = formRef.current.querySelector<HTMLTextAreaElement>('[name="message"]');
-          if (messageElement !== null) {
-            messageElement.value = '';
-          }
-
-          const filesElement = formRef.current.querySelector<HTMLInputElement>('[name="files"]');
-          if (filesElement !== null) {
-            filesElement.type = 'text';
-            filesElement.value = '';
-            filesElement.type = 'file';
-          }
+        if (messageRef.current !== null) {
+          messageRef.current.value = '';
         }
+
+        clearFileInput.current();
 
         localStorage.setItem(MESSAGE, message.current);
       } catch (e) {
@@ -114,9 +110,10 @@ export function PostingForm({ className, slug, parentId }: PostingFormProps) {
         maxLength={MAX_MESSAGE_LENGTH}
         defaultValue={defaultMessage}
         onChange={onMessageChange}
+        ref={messageRef}
       ></textarea>
 
-      <FileInput className="posting-form__files-row" onChange={onFilesChange} />
+      <FileInput className="posting-form__files-row" setClear={setClearFileInput} onChange={onFilesChange} />
     </form>
   );
 }

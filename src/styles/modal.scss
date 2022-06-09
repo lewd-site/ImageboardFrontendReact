@@ -91,10 +91,8 @@
   &__body {
     flex: 1;
   }
-}
 
-@media screen and (max-width: 600px) {
-  .modal {
+  @media screen and (max-width: 600px) {
     transform: none !important;
 
     width: 100% !important;

@@ -7,6 +7,7 @@
 
   height: 100%;
 
+  padding: 0 16px;
   margin: 0 auto;
 
   &__left,
@@ -22,9 +23,11 @@
     justify-content: flex-end;
   }
 
+  &__show-menu,
   &__show-post-form {
     display: flex;
     flex-flow: row nowrap;
+    justify-content: center;
     align-items: center;
 
     background: none;
@@ -40,16 +43,31 @@
 
     .icon {
       color: #9da2b2;
-
       font-size: 18px;
-
-      margin-right: 8px;
     }
 
     &:hover {
       .icon {
-        color: var(--primary);
+        color: var(--foreground);
       }
+    }
+  }
+
+  &__show-menu {
+    &:hover {
+      background: none;
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    &__show-menu {
+      display: none;
+    }
+  }
+
+  &__show-post-form {
+    .icon {
+      margin-right: 8px;
     }
   }
 }

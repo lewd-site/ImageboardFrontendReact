@@ -1,4 +1,39 @@
 .sidebar {
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: none;
+    border: 0;
+    border-radius: 0;
+
+    font-size: 18px;
+
+    width: 24px;
+    height: 24px;
+
+    padding: 0;
+
+    &:hover {
+      background: none;
+
+      .icon {
+        color: #cfd4e3;
+      }
+    }
+  }
+
+  @media screen and (min-width: 1200px) {
+    &__close {
+      display: none;
+    }
+  }
+
   &__list,
   &__item {
     list-style: none;
@@ -41,7 +76,7 @@
       background-color: #303339;
 
       .icon {
-        color: var(--primary);
+        color: var(--foreground);
       }
     }
   }

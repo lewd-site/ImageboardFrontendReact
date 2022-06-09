@@ -1,13 +1,14 @@
-import { useRef, useState, useCallback, ChangeEvent, useMemo } from 'react';
+import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect } from 'react';
 
 interface FileInputProps {
   readonly className?: string;
   readonly onChange?: (files: File[]) => void;
+  readonly setClear?: (clear: () => void) => void;
 }
 
 const MAX_FILES = 5;
 
-export function FileInput({ className, onChange }: FileInputProps) {
+export function FileInput({ className, onChange, setClear }: FileInputProps) {
   const files = useRef<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -61,6 +62,32 @@ export function FileInput({ className, onChange }: FileInputProps) {
     [previewUrls]
   );
 
+  const filesRef = useRef<HTMLInputElement>(null);
+  const clear = useCallback(() => {
+    const filesElement = filesRef.current;
+    if (filesElement !== null) {
+      filesElement.type = 'text';
+      filesElement.value = '';
+      filesElement.type = 'file';
+    }
+
+    files.current = [];
+
+    setPreviewUrls((previews) => {
+      for (const preview of previews) {
+        URL.revokeObjectURL(preview);
+      }
+
+      return [];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (typeof setClear !== 'undefined') {
+      setClear(clear);
+    }
+  }, [setClear]);
+
   return (
     <div className={[className, 'file-input'].join(' ')}>
       <div className="file-input__previews">{previews}</div>
@@ -68,7 +95,15 @@ export function FileInput({ className, onChange }: FileInputProps) {
       <label className="file-input__files">
         <span className="icon icon_attach"></span>
         <span className="file-input__files-label">Прикрепить файлы…</span>
-        <input className="file-input__files-input" name="files" type="file" multiple onChange={onFilesChange} />
+
+        <input
+          className="file-input__files-input"
+          name="files"
+          type="file"
+          multiple
+          ref={filesRef}
+          onChange={onFilesChange}
+        />
       </label>
     </div>
   );
