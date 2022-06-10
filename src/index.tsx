@@ -44,6 +44,7 @@ function createApp() {
       path: '/',
       element: <Layout />,
       loader: async () => ({ boards: await browseBoards() }),
+      loaderMaxAge: 0,
       children: [
         {
           id: 'index',

@@ -7,7 +7,7 @@ import { LocationGenerics } from '../types';
 export function Header() {
   const matches = useMatches<LocationGenerics>();
   const onMenuClick = useCallback(() => eventBus.dispatch(SHOW_MENU), []);
-  const onCreatePostClick = useCallback(() => eventBus.dispatch(SHOW_POST_FORM), []);
+  const showPostForm = useCallback(() => eventBus.dispatch(SHOW_POST_FORM), []);
 
   return (
     <div className="header">
@@ -20,8 +20,15 @@ export function Header() {
       <div className="header__center"></div>
 
       <div className="header__right">
+        {matches.some((match) => match.route.meta?.name === 'board') && (
+          <button type="button" className="header__show-post-form" onClick={showPostForm}>
+            <span className="icon icon_discussion"></span>
+            Создать тред
+          </button>
+        )}
+
         {matches.some((match) => match.route.meta?.name === 'thread') && (
-          <button type="button" className="header__show-post-form" onClick={onCreatePostClick}>
+          <button type="button" className="header__show-post-form" onClick={showPostForm}>
             <span className="icon icon_discussion"></span>
             Ответить в тред
           </button>

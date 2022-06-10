@@ -6,8 +6,10 @@ import { SHOW_POST_FORM } from '../events';
 import { PostingForm } from './posting-form';
 
 interface PostingFormModalProps {
+  readonly title: string;
   readonly slug: string;
-  readonly parentId: number;
+  readonly parentId: number | null;
+  readonly showSubject: boolean;
 }
 
 const POSTING_FORM_LEFT = 'posting-form.left';
@@ -20,7 +22,7 @@ const MODAL_MIN_HEIGHT = 250;
 
 const MOBILE_MAX_WIDTH = 600;
 
-export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
+export function PostingFormModal({ title, slug, parentId, showSubject }: PostingFormModalProps) {
   const [modalTransition, setModalTransition] = useState(false);
   useEffect(() => {
     function handler() {
@@ -75,7 +77,7 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
   const onExited = useCallback(() => setModalVisible(false), []);
 
   const postingForm = useMemo(
-    () => <PostingForm className="modal__body" slug={slug} parentId={parentId} />,
+    () => <PostingForm className="modal__body" slug={slug} parentId={parentId} showSubject={showSubject} />,
     [slug, parentId]
   );
 
@@ -115,7 +117,7 @@ export function PostingFormModal({ slug, parentId }: PostingFormModalProps) {
           disableDragging={isMobile}
         >
           <div className="modal__header">
-            <h3 className="modal__title">Ответ в тред #{parentId}</h3>
+            <h3 className="modal__title">{title}</h3>
 
             <button type="button" className="modal__close" title="Закрыть" onClick={onCloseClick}>
               <span className="icon icon_close"></span>

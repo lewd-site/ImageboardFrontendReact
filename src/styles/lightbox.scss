@@ -39,15 +39,16 @@
   display: block !important;
 
   background: var(--foreground);
-  border-radius: 4px;
   box-shadow: 0 0 8px 0 rgba(#000, 0.1);
 
   padding: 0;
 
   pointer-events: initial;
+  backface-visibility: hidden;
 
   &_transition {
-    transition: transform 100ms ease;
+    transition: width 100ms ease, height 100ms ease, transform 100ms ease;
+    will-change: width, height, transform;
   }
 
   &__picture {

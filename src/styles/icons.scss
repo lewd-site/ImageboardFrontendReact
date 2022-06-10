@@ -8,9 +8,14 @@
 
   background-color: currentColor;
 
-  mask-position: center;
-  mask-repeat: no-repeat;
-  mask-size: 100% 100%;
+  @each $icon in $icons {
+    &_#{$icon} {
+      mask-image: url('./icons/#{$icon}.svg');
+      mask-position: center center;
+      mask-repeat: no-repeat;
+      mask-size: 100% 100%;
+    }
+  }
 
   width: 1em;
   height: 1em;
@@ -19,10 +24,4 @@
   min-height: 1em;
 
   transition: color 100ms ease, background-color 100ms ease;
-
-  @each $icon in $icons {
-    &_#{$icon} {
-      mask-image: url('./icons/#{$icon}.svg');
-    }
-  }
 }

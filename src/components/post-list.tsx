@@ -3,6 +3,8 @@ import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
 import { Lightbox } from './lightbox';
+import { eventBus } from '../event-bus';
+import { POST_CREATED } from '../events';
 
 interface Rect {
   readonly width: number;
@@ -123,13 +125,21 @@ export function PostList({ className, posts }: PostListProps) {
     [posts]
   );
 
-  const onScrollTop = useCallback(() => {
+  const scrollToTop = useCallback(() => {
     virtualizer.scrollToIndex(0, { align: 'end' });
   }, []);
 
-  const onScrollBottom = useCallback(() => {
+  const scrollToBottom = useCallback(() => {
     virtualizer.scrollToIndex(posts.length, { align: 'start' });
   }, [posts]);
+
+  useEffect(() => {
+    function handler() {
+      scrollToBottom();
+    }
+
+    return eventBus.subscribe(POST_CREATED, handler);
+  }, [scrollToBottom]);
 
   const [scrollTopVisible, setScrollTopVisible] = useState(false);
   const [scrollBottomVisible, setScrollBottomVisible] = useState(true);
@@ -201,7 +211,7 @@ export function PostList({ className, posts }: PostListProps) {
           'layout__scroll-top',
           scrollTopVisible ? 'layout__scroll-top_visible' : 'layout__scroll-top_hidden',
         ].join(' ')}
-        onClick={onScrollTop}
+        onClick={scrollToTop}
       >
         <span className="icon icon_up"></span>
       </button>
@@ -212,7 +222,7 @@ export function PostList({ className, posts }: PostListProps) {
           'layout__scroll-bottom',
           scrollBottomVisible ? 'layout__scroll-bottom_visible' : 'layout__scroll-bottom_hidden',
         ].join(' ')}
-        onClick={onScrollBottom}
+        onClick={scrollToBottom}
       >
         <span className="icon icon_down"></span>
       </button>

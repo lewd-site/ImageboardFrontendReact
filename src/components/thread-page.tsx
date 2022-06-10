@@ -49,7 +49,10 @@ export function ThreadPage() {
   }, [slug, parentId]);
 
   const postList = useMemo(() => <PostList className="thread-page__posts" posts={[...posts.values()]} />, [posts]);
-  const postingFormModal = useMemo(() => <PostingFormModal slug={slug} parentId={parentId} />, [slug, parentId]);
+  const postingFormModal = useMemo(
+    () => <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />,
+    [slug, parentId]
+  );
 
   return (
     <div className="thread-page">

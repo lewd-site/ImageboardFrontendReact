@@ -1,6 +1,7 @@
 import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DraggableData, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
+import { throttle } from 'throttle-debounce';
 import { File } from '../domain';
 
 interface LightboxProps {
@@ -73,8 +74,15 @@ export function Lightbox({ visible, file, onClose }: LightboxProps) {
 
       setPosition({ x, y });
 
+      if (transitionTimeout.current !== null) {
+        clearTimeout(transitionTimeout.current);
+      }
+
       setTransition(true);
-      setTimeout(() => setTransition(false), 100);
+      transitionTimeout.current = setTimeout(() => {
+        setTransition(false);
+        transitionTimeout.current = null;
+      }, 100);
 
       if (
         typeof onClose !== 'undefined' &&
@@ -91,16 +99,47 @@ export function Lightbox({ visible, file, onClose }: LightboxProps) {
     event.preventDefault();
   }, []);
 
+  const transitionTimeout = useRef<any>();
+
   const onWheel = useCallback(
-    (event: React.WheelEvent) => {
+    throttle(100, (event: React.WheelEvent) => {
       const scale = event.deltaY > 0 ? 1 / 1.1 : 1.1;
-      setSize((size) => ({ width: size.width * scale, height: size.height * scale }));
+
+      setSize((size) => {
+        if (file === null) {
+          return size;
+        }
+
+        const fileWidth = file.width || 200;
+        const fileHeight = file.height || 200;
+
+        const newWidth = size.width * scale;
+        const newHeight = size.height * scale;
+
+        if ((newWidth < fileWidth && newWidth < 200) || (newHeight < fileHeight && newHeight < 200)) {
+          return size;
+        }
+
+        return { width: newWidth, height: newHeight };
+      });
+
       setPosition((position) => {
+        if (file === null) {
+          return position;
+        }
+
+        const fileWidth = file.width || 200;
+        const fileHeight = file.height || 200;
+
         const relativeX = (event.clientX - position.x) / size.width;
         const relativeY = (event.clientY - position.y) / size.height;
 
         const newWidth = size.width * scale;
         const newHeight = size.height * scale;
+
+        if ((newWidth < fileWidth && newWidth < 200) || (newHeight < fileHeight && newHeight < 200)) {
+          return position;
+        }
 
         const deltaWidth = newWidth - size.width;
         const deltaHeight = newHeight - size.height;
@@ -119,8 +158,21 @@ export function Lightbox({ visible, file, onClose }: LightboxProps) {
 
         return { x, y };
       });
-    },
-    [size]
+
+      // Can't work properly in other browsers
+      if (navigator.userAgent.indexOf('Firefox') !== -1) {
+        if (transitionTimeout.current !== null) {
+          clearTimeout(transitionTimeout.current);
+        }
+
+        setTransition(true);
+        transitionTimeout.current = setTimeout(() => {
+          setTransition(false);
+          transitionTimeout.current = null;
+        }, 100);
+      }
+    }),
+    [file, size]
   );
 
   const overlayClassName = [

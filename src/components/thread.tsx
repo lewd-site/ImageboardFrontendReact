@@ -28,6 +28,8 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
   return (
     <div id={`post_${thread.id}`} className={['post', className].join(' ')}>
       <div className="post__header">
+        <span className="post__subject">{thread.subject}</span>
+
         <span className="post__author">
           <span className="post__name">{name}</span>
           <span className="post__tripcode">{thread.tripcode}</span>

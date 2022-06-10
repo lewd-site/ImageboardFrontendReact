@@ -248,6 +248,34 @@ export async function browsePosts(slug: string, parentId: number): Promise<Post[
   });
 }
 
+export async function createThread(
+  slug: string,
+  subject: string,
+  name: string,
+  message: string,
+  files: File[]
+): Promise<Thread> {
+  const body = new FormData();
+  body.append('subject', subject);
+  body.append('name', name);
+  body.append('message', message);
+  for (const file of files) {
+    body.append('files', file, file.name);
+  }
+
+  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads`, {
+    method: 'POST',
+    body,
+  });
+
+  const { item } = await response.json();
+  if (!isThreadDto(item)) {
+    throw new ApiError(`Invalid thread DTO: ${JSON.stringify(item)}`);
+  }
+
+  return convertThreadDtoToThread(item);
+}
+
 export async function createPost(
   slug: string,
   parentId: number,
