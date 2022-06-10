@@ -7,10 +7,11 @@ import { File } from '../domain';
 interface LightboxProps {
   readonly visible: boolean;
   readonly file: File | null;
+  readonly setResetPosition?: (resetPosition: (file: File) => void) => void;
   readonly onClose?: () => void;
 }
 
-export function Lightbox({ visible, file, onClose }: LightboxProps) {
+export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const [lightboxVisible, setLightboxVisible] = useState(true);
@@ -35,11 +36,8 @@ export function Lightbox({ visible, file, onClose }: LightboxProps) {
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
-  useEffect(() => {
-    if (file === null) {
-      return;
-    }
 
+  const resetPosition = useCallback((file: File) => {
     const fileWidth = file.width || 200;
     const fileHeight = file.height || 200;
 
@@ -52,6 +50,20 @@ export function Lightbox({ visible, file, onClose }: LightboxProps) {
 
     setPosition({ x: window.innerWidth / 2 - width / 2, y: window.innerHeight / 2 - height / 2 });
     setSize({ width, height });
+  }, []);
+
+  useEffect(() => {
+    if (typeof setResetPosition !== 'undefined') {
+      setResetPosition(resetPosition);
+    }
+  }, [resetPosition, setResetPosition]);
+
+  useEffect(() => {
+    if (file === null) {
+      return;
+    }
+
+    resetPosition(file);
   }, [file]);
 
   const dragStartPosition = useRef({ x: 0, y: 0 });

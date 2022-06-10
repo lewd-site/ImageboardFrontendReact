@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
@@ -164,12 +164,19 @@ export function PostList({ className, posts }: PostListProps) {
   const [lightboxVisible, setLightboxVisible] = useState<boolean>(false);
   const [file, setFile] = useState<FileModel | null>(null);
 
+  const resetPosition = useRef((file: FileModel) => {});
+  const setResetPosition = useCallback((value: (file: FileModel) => void) => (resetPosition.current = value), []);
+
   const onThumbnailClick = useCallback(
     (newFile: FileModel) => {
       setFile((file) => {
-        if (lightboxVisible && file === newFile) {
-          setLightboxVisible(false);
-          return file;
+        if (file?.hash === newFile?.hash) {
+          if (lightboxVisible) {
+            setLightboxVisible(false);
+            return file;
+          } else {
+            resetPosition.current(file);
+          }
         }
 
         setTimeout(() => {
@@ -184,6 +191,13 @@ export function PostList({ className, posts }: PostListProps) {
   );
 
   const onLightboxClose = useCallback(() => setLightboxVisible(false), []);
+
+  const lightbox = useMemo(
+    () => (
+      <Lightbox visible={lightboxVisible} file={file} setResetPosition={setResetPosition} onClose={onLightboxClose} />
+    ),
+    [lightboxVisible, file]
+  );
 
   return (
     <div className={[className, 'post-list'].join(' ')}>
@@ -227,7 +241,7 @@ export function PostList({ className, posts }: PostListProps) {
         <span className="icon icon_down"></span>
       </button>
 
-      <Lightbox visible={lightboxVisible} file={file} onClose={onLightboxClose} />
+      {lightbox}
     </div>
   );
 }
