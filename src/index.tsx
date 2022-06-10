@@ -9,6 +9,7 @@ import { Spinner } from './components/spinner';
 import { ThreadPage } from './components/thread-page';
 import settings, { Settings } from './settings';
 import { LocationGenerics } from './types';
+import '@lewd-site/components';
 
 function applySettings(settings: Settings) {
   if (settings.nsfw) {

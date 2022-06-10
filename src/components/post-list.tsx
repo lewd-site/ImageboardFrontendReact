@@ -179,15 +179,17 @@ export function PostList({ className, posts }: PostListProps) {
           }
         }
 
+        return file?.originalUrl === newFile.originalUrl ? file : null;
+      });
+
+      if (!lightboxVisible || file?.hash !== newFile?.hash) {
         setTimeout(() => {
           setLightboxVisible(true);
           setFile(newFile);
         });
-
-        return file?.originalUrl === newFile.originalUrl ? file : null;
-      });
+      }
     },
-    [lightboxVisible]
+    [file, lightboxVisible]
   );
 
   const onLightboxClose = useCallback(() => setLightboxVisible(false), []);
@@ -196,7 +198,7 @@ export function PostList({ className, posts }: PostListProps) {
     () => (
       <Lightbox visible={lightboxVisible} file={file} setResetPosition={setResetPosition} onClose={onLightboxClose} />
     ),
-    [lightboxVisible, file]
+    [lightboxVisible, file, setResetPosition, onLightboxClose]
   );
 
   return (

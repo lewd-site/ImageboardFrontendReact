@@ -47,13 +47,15 @@ export function BoardPage() {
           }
         }
 
+        return file?.originalUrl === newFile.originalUrl ? file : null;
+      });
+
+      if (!lightboxVisible || file?.hash !== newFile?.hash) {
         setTimeout(() => {
           setLightboxVisible(true);
           setFile(newFile);
         });
-
-        return file?.originalUrl === newFile.originalUrl ? file : null;
-      });
+      }
     },
     [lightboxVisible]
   );

@@ -1,8 +1,17 @@
-import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { DragEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DraggableData, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { throttle } from 'throttle-debounce';
 import { File } from '../domain';
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'audio-player': any;
+      'video-player': any;
+    }
+  }
+}
 
 interface LightboxProps {
   readonly visible: boolean;
@@ -11,13 +20,16 @@ interface LightboxProps {
   readonly onClose?: () => void;
 }
 
+const MAX_THUMB_WIDTH = 200;
+const MAX_THUMB_HEIGHT = 200;
+
 export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const [lightboxVisible, setLightboxVisible] = useState(true);
   useEffect(() => setLightboxVisible(false), []);
 
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (elementRef.current === null) {
       return;
@@ -38,14 +50,19 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   const resetPosition = useCallback((file: File) => {
-    const fileWidth = file.width || 200;
-    const fileHeight = file.height || 200;
+    const fileWidth = file.width || MAX_THUMB_WIDTH;
+    const fileHeight = file.height || MAX_THUMB_HEIGHT;
 
     const maxWidth = Math.min(fileWidth, window.innerWidth, 800);
     const maxHeight = Math.min(fileHeight, window.innerHeight, 800);
 
     const scale = Math.min(1, maxWidth / fileWidth, maxHeight / fileHeight);
-    const width = scale * fileWidth;
+
+    let width = scale * fileWidth;
+    if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+      width = Math.max(width, 350);
+    }
+
     const height = scale * fileHeight;
 
     setPosition({ x: window.innerWidth / 2 - width / 2, y: window.innerHeight / 2 - height / 2 });
@@ -98,13 +115,14 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
 
       if (
         typeof onClose !== 'undefined' &&
+        file?.type.startsWith('image/') &&
         Math.abs(dragStartPosition.current.x - data.x) < 1 &&
         Math.abs(dragStartPosition.current.y - data.y) < 1
       ) {
         onClose();
       }
     },
-    [size, onClose]
+    [file, size, onClose]
   );
 
   const onDragStart = useCallback((event: DragEvent) => {
@@ -122,13 +140,16 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
           return size;
         }
 
-        const fileWidth = file.width || 200;
-        const fileHeight = file.height || 200;
+        const fileWidth = file.width || MAX_THUMB_WIDTH;
+        const fileHeight = file.height || MAX_THUMB_HEIGHT;
 
         const newWidth = size.width * scale;
         const newHeight = size.height * scale;
 
-        if ((newWidth < fileWidth && newWidth < 200) || (newHeight < fileHeight && newHeight < 200)) {
+        if (
+          (newWidth < fileWidth && newWidth < MAX_THUMB_WIDTH) ||
+          (newHeight < fileHeight && newHeight < MAX_THUMB_HEIGHT)
+        ) {
           return size;
         }
 
@@ -140,8 +161,8 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
           return position;
         }
 
-        const fileWidth = file.width || 200;
-        const fileHeight = file.height || 200;
+        const fileWidth = file.width || MAX_THUMB_WIDTH;
+        const fileHeight = file.height || MAX_THUMB_HEIGHT;
 
         const relativeX = (event.clientX - position.x) / size.width;
         const relativeY = (event.clientY - position.y) / size.height;
@@ -149,7 +170,10 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
         const newWidth = size.width * scale;
         const newHeight = size.height * scale;
 
-        if ((newWidth < fileWidth && newWidth < 200) || (newHeight < fileHeight && newHeight < 200)) {
+        if (
+          (newWidth < fileWidth && newWidth < MAX_THUMB_WIDTH) ||
+          (newHeight < fileHeight && newHeight < MAX_THUMB_HEIGHT)
+        ) {
           return position;
         }
 
@@ -192,7 +216,53 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
     lightboxVisible ? 'lightbox-overlay_visible' : 'lightbox-overlay_hidden',
   ].join(' ');
 
-  const lightboxClass = ['lightbox', transition ? 'lightbox_transition' : ''].join(' ');
+  const lightboxClass = [
+    'lightbox',
+    transition ? 'lightbox_transition' : '',
+    file !== null ? `lightbox_${file.type.split('/').shift()}` : '',
+  ].join(' ');
+
+  let fileElement = null;
+  if (file !== null) {
+    if (file.type.startsWith('image/')) {
+      fileElement = (
+        <picture className="lightbox__picture" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+          <img className="lightbox__image" src={file.originalUrl} alt="" />
+        </picture>
+      );
+    } else if (file.type.startsWith('audio/')) {
+      fileElement = (
+        <div className="lightbox__audio-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+          <picture className="lightbox__picture">
+            <source srcSet={file.fallbackThumbnailUrl} type={file.fallbackThumbnailType} />
+            <img className="file__image" src={file.thumbnailUrl} alt="" />
+          </picture>
+          {lightboxVisible && (
+            <audio-player
+              class="lightbox__audio"
+              autoplay={true}
+              loop={true}
+              src={file.originalUrl}
+              width={size.width}
+            ></audio-player>
+          )}
+        </div>
+      );
+    } else if (file.type.startsWith('video/')) {
+      fileElement = lightboxVisible && (
+        <div className="lightbox__video-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+          <video-player
+            class="lightbox__video"
+            autoplay={true}
+            loop={true}
+            src={file.originalUrl}
+            width={size.width}
+            height={size.height}
+          ></video-player>
+        </div>
+      );
+    }
+  }
 
   return (
     <CSSTransition
@@ -212,11 +282,7 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
           onDragStart={onRndDragStart}
           onDragStop={onRndDragStop}
         >
-          {file !== null && (
-            <picture className="lightbox__picture" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-              <img className="lightbox__image" src={file.originalUrl} alt="" />
-            </picture>
-          )}
+          {fileElement}
         </Rnd>
       </div>
     </CSSTransition>

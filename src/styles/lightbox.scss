@@ -51,6 +51,24 @@
     will-change: width, height, transform;
   }
 
+  &__audio-wrapper {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+  }
+
+  &__video-wrapper {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+  }
+
   &__picture {
     width: 100%;
     height: 100%;
@@ -62,5 +80,16 @@
 
     object-fit: cover;
     object-position: center;
+  }
+
+  &__audio {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    display: block;
+
+    width: 100%;
   }
 }

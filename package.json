@@ -42,6 +42,7 @@
     "typescript": "^4.7.2"
   },
   "dependencies": {
+    "@lewd-site/components": "https://github.com/lewd-site/Components",
     "@tanstack/react-location": "^3.7.4",
     "@tanstack/react-virtual": "^3.0.0-alpha.0",
     "@tanstack/virtual-core": "^3.0.0-alpha.1",

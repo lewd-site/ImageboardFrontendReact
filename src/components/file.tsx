@@ -8,8 +8,11 @@ interface FileProps {
 
 const BORDER_WIDTH = 1;
 
-const THUMB_WIDTH = 200;
-const THUMB_HEIGHT = 200;
+const AUDIO_THUMB_WIDTH = 96;
+const AUDIO_THUMB_HEIGHT = 96;
+
+const MAX_THUMB_WIDTH = 200;
+const MAX_THUMB_HEIGHT = 200;
 
 const units = ['', 'К', 'М', 'Г', 'Т', 'П'];
 
@@ -23,10 +26,10 @@ function formatFileSize(value: number): string {
 }
 
 export function File({ file, onThumbnailClick }: FileProps) {
-  const width = file.width || THUMB_WIDTH;
-  const height = file.height || THUMB_HEIGHT;
+  const width = file.width || AUDIO_THUMB_WIDTH;
+  const height = file.height || AUDIO_THUMB_HEIGHT;
 
-  const scale = Math.max(1, width / THUMB_WIDTH, height / THUMB_HEIGHT);
+  const scale = Math.max(1, width / MAX_THUMB_WIDTH, height / MAX_THUMB_HEIGHT);
 
   const thumbnailWidth = width / scale;
   const thumbnailHeight = height / scale;
