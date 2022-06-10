@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo } from 'react';
+import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo, KeyboardEvent } from 'react';
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
 import { POST_CREATED, THREAD_CREATED } from '../events';
@@ -71,6 +71,10 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const clearFileInput = useRef(() => {});
   const setClearFileInput = useCallback((clear: () => void) => (clearFileInput.current = clear), []);
 
+  const onKeyDown = useCallback((event: KeyboardEvent) => {
+    event.stopPropagation();
+  }, []);
+
   const onSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
@@ -113,7 +117,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   );
 
   return (
-    <form className={[className, 'posting-form'].join(' ')} onSubmit={onSubmit} ref={formRef}>
+    <form className={[className, 'posting-form'].join(' ')} onKeyDown={onKeyDown} onSubmit={onSubmit} ref={formRef}>
       {showSubject && (
         <div className="posting-form__row">
           <input

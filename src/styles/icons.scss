@@ -11,11 +11,12 @@
   @each $icon in $icons {
     &_#{$icon} {
       mask-image: url('./icons/#{$icon}.svg');
-      mask-position: center center;
-      mask-repeat: no-repeat;
-      mask-size: 100% 100%;
     }
   }
+
+  mask-position: center center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 
   width: 1em;
   height: 1em;
