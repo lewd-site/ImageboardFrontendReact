@@ -84,6 +84,20 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
                   </span>
                 );
 
+              case 'color':
+                return (
+                  <span className="color" style={{ color: node.value }} key={index}>
+                    {children}
+                  </span>
+                );
+
+              case 'size':
+                return (
+                  <span className="size" style={{ fontSize: `${node.value}px` }} key={index}>
+                    {children}
+                  </span>
+                );
+
               default:
                 console.warn(`Unknown node style: ${node.style}`);
                 return children;

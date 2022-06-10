@@ -1,4 +1,11 @@
 .file {
+  border: 2px solid transparent;
+
+  &_audio,
+  &_video {
+    border: 2px dashed #eee;
+  }
+
   &__link {
     display: block;
 

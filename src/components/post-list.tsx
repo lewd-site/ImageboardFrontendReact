@@ -19,7 +19,7 @@ interface PostListProps {
 const POST_HEADER_HEIGHT = 24;
 const POST_HEADER_MARGIN = 4;
 const POST_FILE_MARGIN = 4;
-const BORDER_WIDTH = 1;
+const BORDER_WIDTH = 2;
 const POST_MESSAGE_LINE_HEIGHT = 24;
 const POST_MARGIN = 16;
 

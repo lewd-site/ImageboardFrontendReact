@@ -135,6 +135,10 @@ export function convertFileDtoToFile(file: FileDto): FileModel {
     length: file.length,
     createdAt: new Date(file.created_at),
 
+    get isAudioWithoutPreview() {
+      return this.type.startsWith('audio/') && (this.width === null || this.height === null);
+    },
+
     get isTransparent() {
       return ['png', 'gif', 'webp'].includes(this.extension);
     },
@@ -155,16 +159,32 @@ export function convertFileDtoToFile(file: FileDto): FileModel {
       return height / Math.max(1, width / THUMB_WIDTH, height / THUMB_HEIGHT);
     },
     get thumbnailUrl() {
+      if (this.isAudioWithoutPreview) {
+        return '/audio.webp';
+      }
+
       return `${config.content.baseUrl}/thumbnails/${this.hash}.webp`;
     },
 
     get fallbackThumbnailExtension() {
+      if (this.isAudioWithoutPreview) {
+        return 'png';
+      }
+
       return this.isTransparent ? 'png' : 'jpg';
     },
     get fallbackThumbnailType() {
+      if (this.isAudioWithoutPreview) {
+        return 'image/png';
+      }
+
       return this.isTransparent ? 'image/png' : 'image/jpeg';
     },
     get fallbackThumbnailUrl() {
+      if (this.isAudioWithoutPreview) {
+        return '/audio.png';
+      }
+
       return `${config.content.baseUrl}/thumbnails/${this.hash}.${this.fallbackThumbnailExtension}`;
     },
   };

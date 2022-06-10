@@ -52,7 +52,7 @@ export function File({ file, onThumbnailClick }: FileProps) {
 
   return (
     <div
-      className="post__file file"
+      className={['post__file', 'file', `file_${file.type.split('/').shift()}`].join(' ')}
       style={{ width: `${thumbnailWidth + 2 * BORDER_WIDTH}px`, height: `${thumbnailHeight + 2 * BORDER_WIDTH}px` }}
     >
       <a className="file__link" href={file.originalUrl} target="_blank" title={fileInfo} onClick={onClick}>

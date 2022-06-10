@@ -25,7 +25,9 @@ interface StyleNode {
     | 'superscript'
     | 'spoiler'
     | 'code'
-    | 'quote';
+    | 'quote'
+    | 'color'
+    | 'size';
   readonly value: string;
   readonly children: Markup[];
 }
@@ -61,6 +63,8 @@ export interface File {
   readonly height: number | null;
   readonly length: number | null;
   readonly createdAt: Date;
+
+  get isAudioWithoutPreview(): boolean;
 
   get isTransparent(): boolean;
   get originalUrl(): string;
