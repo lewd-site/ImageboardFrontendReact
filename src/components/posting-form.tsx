@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo, KeyboardEvent } from 'react';
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
-import { INSERT_QUOTE, POST_CREATED, THREAD_CREATED } from '../events';
+import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { FileInput } from './file-input';
 
 interface PostingFormProps {
@@ -18,6 +18,8 @@ const MESSAGE = 'posting-form.message';
 const MAX_SUBJECT_LEGTH = 100;
 const MAX_NAME_LEGTH = 100;
 const MAX_MESSAGE_LENGTH = 8000;
+
+const FOCUS_DELAY = 100;
 
 export function PostingForm({ className, slug, parentId, showSubject }: PostingFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -72,7 +74,13 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const setClearFileInput = useCallback((clear: () => void) => (clearFileInput.current = clear), []);
 
   useEffect(() => {
-    function handler(postId?: number) {
+    function setFocus() {
+      setTimeout(() => {
+        messageRef.current?.focus();
+      }, FOCUS_DELAY);
+    }
+
+    function insertQuote(postId?: number) {
       if (typeof postId === 'undefined') {
         return;
       }
@@ -119,59 +127,75 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         setTimeout(() => {
           messageRef.current?.setSelectionRange(cursor, cursor);
         });
-      }, 100);
+      }, FOCUS_DELAY);
     }
 
-    return eventBus.subscribe(INSERT_QUOTE, handler);
+    const subscriptions = [eventBus.subscribe(SHOW_POST_FORM, setFocus), eventBus.subscribe(INSERT_QUOTE, insertQuote)];
+
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, []);
 
   const onKeyDown = useCallback((event: KeyboardEvent) => {
     event.stopPropagation();
   }, []);
 
-  const onSubmit = useCallback(
-    async (event: FormEvent) => {
-      event.preventDefault();
-      if (submitting) {
-        return;
+  const submit = useCallback(async () => {
+    if (submitting) {
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      if (parentId === null) {
+        const thread = await createThread(slug, subject.current, name.current, message.current, files.current);
+        eventBus.dispatch(THREAD_CREATED, thread);
+      } else {
+        const post = await createPost(slug, parentId, name.current, message.current, files.current);
+        eventBus.dispatch(POST_CREATED, post);
       }
 
-      setSubmitting(true);
-      setError(null);
+      subject.current = '';
+      message.current = '';
+      files.current = [];
 
-      try {
-        if (parentId === null) {
-          const thread = await createThread(slug, subject.current, name.current, message.current, files.current);
-          eventBus.dispatch(THREAD_CREATED, thread);
-        } else {
-          const post = await createPost(slug, parentId, name.current, message.current, files.current);
-          eventBus.dispatch(POST_CREATED, post);
-        }
+      if (subjectRef.current !== null) {
+        subjectRef.current.value = '';
+      }
 
-        subject.current = '';
-        message.current = '';
-        files.current = [];
+      if (messageRef.current !== null) {
+        messageRef.current.value = '';
+      }
 
-        if (subjectRef.current !== null) {
-          subjectRef.current.value = '';
-        }
+      clearFileInput.current();
 
-        if (messageRef.current !== null) {
-          messageRef.current.value = '';
-        }
+      localStorage.setItem(SUBJECT, subject.current);
+      localStorage.setItem(MESSAGE, message.current);
+    } catch (e) {
+      setError(e);
+      console.error(e); // TODO: show notification
+    } finally {
+      setSubmitting(false);
+    }
+  }, [submitting, slug, parentId]);
 
-        clearFileInput.current();
-
-        localStorage.setItem(SUBJECT, subject.current);
-        localStorage.setItem(MESSAGE, message.current);
-      } catch (e) {
-        setError(e);
-        console.error(e); // TODO: show notification
-      } finally {
-        setSubmitting(false);
+  const onMessageKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.code === 'Enter') {
+        event.preventDefault();
+        submit();
       }
     },
-    [submitting, slug, parentId]
+    [submit]
+  );
+
+  const onSubmit = useCallback(
+    (event: FormEvent) => {
+      event.preventDefault();
+      submit();
+    },
+    [submit]
   );
 
   return (
@@ -212,6 +236,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         maxLength={MAX_MESSAGE_LENGTH}
         defaultValue={defaultMessage}
         onChange={onMessageChange}
+        onKeyDown={onMessageKeyDown}
         ref={messageRef}
       ></textarea>
 
