@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo, KeyboardEvent } from 'react';
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
-import { POST_CREATED, THREAD_CREATED } from '../events';
+import { INSERT_QUOTE, POST_CREATED, THREAD_CREATED } from '../events';
 import { FileInput } from './file-input';
 
 interface PostingFormProps {
@@ -71,6 +71,60 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const clearFileInput = useRef(() => {});
   const setClearFileInput = useCallback((clear: () => void) => (clearFileInput.current = clear), []);
 
+  useEffect(() => {
+    function handler(postId?: number) {
+      if (typeof postId === 'undefined') {
+        return;
+      }
+
+      const messageInput = messageRef.current;
+      if (messageInput === null) {
+        return;
+      }
+
+      const selection = window.getSelection();
+      const quote = selection ? selection.toString().replace(/\r/g, '').trim() : '';
+
+      const selectionStart = messageInput.selectionStart;
+      const selectionEnd = messageInput.selectionEnd;
+
+      const textBefore = messageInput.value.substring(0, selectionStart);
+      const textAfter = messageInput.value.substring(selectionEnd);
+
+      let cursor = selectionStart;
+      let textToInsert = `>>${postId}` + (quote.length ? `\n${quote}`.replace(/\n/g, '\n> ') : '');
+
+      if (textBefore.length && !textBefore.endsWith('\n')) {
+        textToInsert = `\n${textToInsert}`;
+      }
+
+      if (textAfter.length) {
+        if (textAfter.startsWith('\n')) {
+          textToInsert = `${textToInsert}\n`;
+        } else {
+          textToInsert = `${textToInsert}\n\n`;
+          cursor--;
+        }
+      } else {
+        textToInsert = `${textToInsert}\n`;
+      }
+
+      cursor += textToInsert.length;
+      message.current = `${textBefore}${textToInsert}${textAfter}`;
+      messageInput.value = message.current;
+
+      setTimeout(() => {
+        messageRef.current?.focus();
+
+        setTimeout(() => {
+          messageRef.current?.setSelectionRange(cursor, cursor);
+        });
+      }, 100);
+    }
+
+    return eventBus.subscribe(INSERT_QUOTE, handler);
+  }, []);
+
   const onKeyDown = useCallback((event: KeyboardEvent) => {
     event.stopPropagation();
   }, []);
@@ -78,6 +132,10 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const onSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault();
+      if (submitting) {
+        return;
+      }
+
       setSubmitting(true);
       setError(null);
 
@@ -113,7 +171,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         setSubmitting(false);
       }
     },
-    [slug, parentId]
+    [submitting, slug, parentId]
   );
 
   return (

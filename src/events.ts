@@ -5,3 +5,6 @@ export const SHOW_POST_FORM = 'show_post_form';
 
 export const THREAD_CREATED = 'thread_created';
 export const POST_CREATED = 'post_created';
+
+export const INSERT_QUOTE = 'insert_quote';
+export const INSERT_MARKUP = 'insert_markup';

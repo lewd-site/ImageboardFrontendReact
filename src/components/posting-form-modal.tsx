@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { DraggableData, Position, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { eventBus } from '../event-bus';
-import { SHOW_POST_FORM } from '../events';
+import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { PostingForm } from './posting-form';
 
 interface PostingFormModalProps {
@@ -25,11 +25,22 @@ const MOBILE_MAX_WIDTH = 600;
 export function PostingFormModal({ title, slug, parentId, showSubject }: PostingFormModalProps) {
   const [modalTransition, setModalTransition] = useState(false);
   useEffect(() => {
-    function handler() {
+    function showModal() {
       setModalTransition(true);
     }
 
-    return eventBus.subscribe(SHOW_POST_FORM, handler);
+    function hideModal() {
+      setModalTransition(false);
+    }
+
+    const subscriptions = [
+      eventBus.subscribe(SHOW_POST_FORM, showModal),
+      eventBus.subscribe(INSERT_QUOTE, showModal),
+      eventBus.subscribe(THREAD_CREATED, hideModal),
+      eventBus.subscribe(POST_CREATED, hideModal),
+    ];
+
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, []);
 
   const onCloseClick = useCallback(() => setModalTransition(false), []);

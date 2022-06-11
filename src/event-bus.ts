@@ -11,7 +11,9 @@ export class EventBus {
 
     this._listeners[event].push(listener);
 
-    return () => this._listeners[event].filter((l) => l !== listener);
+    return () => {
+      this._listeners[event] = this._listeners[event].filter((l) => l !== listener);
+    };
   }
 
   public dispatch<T>(event: string, data?: T): void {

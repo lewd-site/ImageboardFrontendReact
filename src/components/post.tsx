@@ -1,7 +1,9 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Post as PostModel, File as FileModel } from '../domain';
 import { Markup } from './markup';
 import { File } from './file';
+import { eventBus } from '../event-bus';
+import { INSERT_QUOTE } from '../events';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -13,19 +15,14 @@ interface PostProps {
 }
 
 export function Post({ className, post, onReflinkClick, onThumbnailClick }: PostProps) {
-  const name = !post.name.length && !post.tripcode.length ? DEFAULT_NAME : post.name;
-  const files = useMemo(
-    () => post.files.map((file, index) => <File file={file} key={index} onThumbnailClick={onThumbnailClick} />),
-    [post.files, onThumbnailClick]
-  );
+  const onReplyClick = useCallback(() => {
+    eventBus.dispatch(INSERT_QUOTE, post.id);
+  }, [post.id]);
 
-  const markup = useMemo(
-    () => <Markup markup={post.messageParsed} onReflinkClick={onReflinkClick} />,
-    [post.messageParsed, onReflinkClick]
-  );
+  const header = useMemo(() => {
+    const name = !post.name.length && !post.tripcode.length ? DEFAULT_NAME : post.name;
 
-  return (
-    <div id={`post_${post.id}`} className={['post', className].join(' ')}>
+    return (
       <div className="post__header">
         <span className="post__author">
           <span className="post__name">{name}</span>
@@ -37,17 +34,44 @@ export function Post({ className, post, onReflinkClick, onThumbnailClick }: Post
         </time>
 
         <span className="post__id">{post.id}</span>
-      </div>
 
+        <button type="button" className="post__reply" onClick={onReplyClick}>
+          <span className="icon icon_reply"></span>
+        </button>
+      </div>
+    );
+  }, [post.name, post.tripcode, post.createdAt, post.id]);
+
+  const message = useMemo(
+    () => (
+      <div className="post__message">
+        <Markup markup={post.messageParsed} onReflinkClick={onReflinkClick} />
+      </div>
+    ),
+    [post.messageParsed, onReflinkClick]
+  );
+
+  const files = useMemo(
+    () => (
       <div
         className={[
           'post__files',
-          files.length === 1 ? 'post__files_single' : files.length > 1 ? 'post__files_multiple' : '',
+          post.files.length === 1 ? 'post__files_single' : post.files.length > 1 ? 'post__files_multiple' : '',
         ].join(' ')}
       >
-        {files}
+        {post.files.map((file, index) => (
+          <File file={file} key={index} onThumbnailClick={onThumbnailClick} />
+        ))}
       </div>
-      <div className="post__message">{markup}</div>
+    ),
+    [post.files, onThumbnailClick]
+  );
+
+  return (
+    <div id={`post_${post.id}`} className={['post', className].join(' ')}>
+      {header}
+      {files}
+      {message}
     </div>
   );
 }
