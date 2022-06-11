@@ -5,6 +5,7 @@ import { Post } from './post';
 import { Lightbox } from './lightbox';
 import { eventBus } from '../event-bus';
 import { POST_CREATED } from '../events';
+import { storage } from '../storage';
 
 interface Rect {
   readonly width: number;
@@ -14,6 +15,7 @@ interface Rect {
 interface PostListProps {
   readonly className?: string;
   readonly posts: PostModel[];
+  readonly ownPostIds?: number[];
 }
 
 const POST_HEADER_HEIGHT = 24;
@@ -67,7 +69,7 @@ function estimateMarkupLines(markup: Markup[]): number {
   return height;
 }
 
-export function PostList({ className, posts }: PostListProps) {
+export function PostList({ className, posts, ownPostIds }: PostListProps) {
   const postHeightCache = useRef(new Map<number, number>());
   const estimateSize = useCallback(
     (index: number) => {
@@ -212,7 +214,12 @@ export function PostList({ className, posts }: PostListProps) {
             key={posts[virtualRow.index].id}
           >
             <Post
-              className="post-list__item"
+              className={[
+                'post-list__item',
+                typeof ownPostIds !== 'undefined' && ownPostIds.includes(posts[virtualRow.index].id)
+                  ? 'post-list__item_own'
+                  : '',
+              ].join(' ')}
               post={posts[virtualRow.index]}
               onReflinkClick={onReflinkClick}
               onThumbnailClick={onThumbnailClick}

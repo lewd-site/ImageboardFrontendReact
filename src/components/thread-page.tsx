@@ -1,6 +1,7 @@
 import { useMatch } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
 import { Post } from '../domain';
+import { OWN_POST_IDS_CHANGED, storage } from '../storage';
 import { LocationGenerics } from '../types';
 import { SseThreadUpdater } from '../updater';
 import { PostList } from './post-list';
@@ -48,7 +49,21 @@ export function ThreadPage() {
     return () => updater.dispose();
   }, [slug, parentId]);
 
-  const postList = useMemo(() => <PostList className="thread-page__posts" posts={[...posts.values()]} />, [posts]);
+  const [ownPostIds, setOwnPostIds] = useState<number[]>([]);
+  useEffect(() => {
+    async function onOwnPostIdsChanged() {
+      setOwnPostIds(await storage.getOwnPostIds(parentId));
+    }
+
+    onOwnPostIdsChanged();
+
+    return storage.subscribe(OWN_POST_IDS_CHANGED, onOwnPostIdsChanged);
+  }, [parentId]);
+
+  const postList = useMemo(
+    () => <PostList className="thread-page__posts" posts={[...posts.values()]} ownPostIds={ownPostIds} />,
+    [posts, ownPostIds]
+  );
   const postingFormModal = useMemo(
     () => <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />,
     [slug, parentId]

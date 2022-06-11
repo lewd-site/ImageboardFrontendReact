@@ -2,6 +2,7 @@ import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMe
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
 import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
+import { storage } from '../storage';
 import { FileInput } from './file-input';
 
 interface PostingFormProps {
@@ -151,9 +152,11 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       if (parentId === null) {
         const thread = await createThread(slug, subject.current, name.current, message.current, files.current);
         eventBus.dispatch(THREAD_CREATED, thread);
+        storage.addOwnPost({ parent_id: null, id: thread.id });
       } else {
         const post = await createPost(slug, parentId, name.current, message.current, files.current);
         eventBus.dispatch(POST_CREATED, post);
+        storage.addOwnPost({ parent_id: post.parentId, id: post.id });
       }
 
       subject.current = '';
