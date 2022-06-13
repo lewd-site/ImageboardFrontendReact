@@ -76,10 +76,12 @@
     display: flex;
     flex-flow: row wrap;
 
+    &:not(:empty) {
+      margin-bottom: -8px;
+    }
+
     &_single {
       float: left;
-
-      margin-right: 4px;
     }
   }
 

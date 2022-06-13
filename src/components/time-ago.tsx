@@ -40,7 +40,7 @@ export function TimeAgo({ value }: TimeAgoProps) {
     return () => clearInterval(id);
   }, [timestamp]);
 
-  const difference = now - timestamp;
+  const difference = Math.max(0, now - timestamp);
   const minutes = Math.floor(difference / SECONDS_IN_MINUTE);
   if (minutes < 60) {
     return <>{formatPlural(minutes, ['минуту', 'минуты', 'минут'])} назад</>;
