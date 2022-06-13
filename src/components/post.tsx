@@ -4,6 +4,7 @@ import { Markup } from './markup';
 import { File } from './file';
 import { eventBus } from '../event-bus';
 import { INSERT_QUOTE } from '../events';
+import { TimeAgo } from './time-ago';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -29,8 +30,8 @@ export function Post({ className, post, onReflinkClick, onThumbnailClick }: Post
           <span className="post__tripcode">{post.tripcode}</span>
         </span>
 
-        <time className="post__date" dateTime={post.createdAt.toISOString()}>
-          {post.createdAt.toLocaleString()}
+        <time className="post__date" dateTime={post.createdAt.toISOString()} title={post.createdAt.toLocaleString()}>
+          <TimeAgo value={post.createdAt} />
         </time>
 
         <span className="post__id">{post.id}</span>

@@ -3,6 +3,7 @@ import { Thread as ThreadModel, File as FileModel } from '../domain';
 import { Markup } from './markup';
 import { File } from './file';
 import { Link } from '@tanstack/react-location';
+import { TimeAgo } from './time-ago';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -35,8 +36,12 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
           <span className="post__tripcode">{thread.tripcode}</span>
         </span>
 
-        <time className="post__date" dateTime={thread.createdAt.toISOString()}>
-          {thread.createdAt.toLocaleString()}
+        <time
+          className="post__date"
+          dateTime={thread.createdAt.toISOString()}
+          title={thread.createdAt.toLocaleString()}
+        >
+          <TimeAgo value={thread.createdAt} />
         </time>
 
         <span className="post__id">{thread.id}</span>
