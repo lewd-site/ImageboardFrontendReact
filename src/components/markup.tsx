@@ -114,7 +114,16 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
             return <Reflink postID={node.postID} onReflinkClick={onReflinkClick} key={index} />;
 
           case 'dice':
-            const result = node.result.join(', ');
+            let result = node.result.join(', ');
+            if (node.result.length > 1) {
+              const min = Math.min(...node.result);
+              const max = Math.max(...node.result);
+
+              let avg = node.result.reduce((prev, curr) => prev + curr, 0) / node.result.length;
+              avg = Number(avg.toFixed(2));
+
+              result += ` (min: ${min}, max: ${max}, avg: ${avg})`;
+            }
 
             return (
               <span className="dice" key={index}>

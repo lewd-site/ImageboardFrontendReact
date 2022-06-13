@@ -21,7 +21,7 @@ function formatFileSize(value: number): string {
     return `${value} байт`;
   }
 
-  const unitIndex = Math.floor(Math.log2(value) / 10);
+  const unitIndex = Math.floor((31 - Math.clz32(value)) / 10);
   return `${(value / Math.pow(1024, unitIndex)).toFixed(2)} ${units[unitIndex]}байт`;
 }
 
