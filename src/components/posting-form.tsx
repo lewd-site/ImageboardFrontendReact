@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
-import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
+import { INSERT_MARKUP, INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { storage } from '../storage';
 import { FileInput } from './file-input';
 
@@ -145,7 +145,45 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       }, FOCUS_DELAY);
     }
 
-    const subscriptions = [eventBus.subscribe(SHOW_POST_FORM, setFocus), eventBus.subscribe(INSERT_QUOTE, insertQuote)];
+    function insertMarkup(args?: { before: string; after: string }) {
+      if (typeof args === 'undefined') {
+        return;
+      }
+
+      const { before, after } = args;
+      const messageInput = messageRef.current;
+      if (messageInput === null) {
+        return;
+      }
+
+      const selectionStart = messageInput.selectionStart;
+      const selectionEnd = messageInput.selectionEnd;
+
+      const textSelected = messageInput.value.substring(selectionStart, selectionEnd);
+      const textToInsert = `${before}${textSelected}${after}`;
+
+      const textBefore = messageInput.value.substring(0, selectionStart);
+      const textAfter = messageInput.value.substring(selectionEnd);
+
+      message.current = `${textBefore}${textToInsert}${textAfter}`;
+      messageInput.value = message.current;
+
+      setTimeout(() => {
+        messageRef.current?.focus();
+
+        setTimeout(() => {
+          const start = selectionStart + before.length;
+          const end = selectionEnd + before.length;
+          messageRef.current?.setSelectionRange(start, end);
+        });
+      }, FOCUS_DELAY);
+    }
+
+    const subscriptions = [
+      eventBus.subscribe(SHOW_POST_FORM, setFocus),
+      eventBus.subscribe(INSERT_QUOTE, insertQuote),
+      eventBus.subscribe(INSERT_MARKUP, insertMarkup),
+    ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, []);
@@ -197,11 +235,34 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
     }
   }, [submitting, slug, parentId]);
 
+  const insertMarkup = useCallback(
+    (before: string, after: string) => eventBus.dispatch(INSERT_MARKUP, { before, after }),
+    []
+  );
+
+  const insertBold = useCallback(() => insertMarkup('**', '**'), []);
+  const insertItalic = useCallback(() => insertMarkup('*', '*'), []);
+  const insertUnderline = useCallback(() => insertMarkup('[u]', '[/u]'), []);
+  const insertStrike = useCallback(() => insertMarkup('~~', '~~'), []);
+  const insertSuperscript = useCallback(() => insertMarkup('[sup]', '[/sup]'), []);
+  const insertSubscript = useCallback(() => insertMarkup('[sub]', '[/sub]'), []);
+  const insertSpoiler = useCallback(() => insertMarkup('%%', '%%'), []);
+
   const onMessageKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.ctrlKey && event.code === 'Enter') {
         event.preventDefault();
         submit();
+      } else if (event.altKey) {
+        if (event.code === 'KeyB') {
+          insertBold();
+        } else if (event.code === 'KeyI') {
+          insertItalic();
+        } else if (event.code === 'KeyT') {
+          insertStrike();
+        } else if (event.code === 'KeyP') {
+          insertSpoiler();
+        }
       }
     },
     [submit]
@@ -243,7 +304,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         <input
           className="posting-form__name"
           name="name"
-          placeholder="Имя"
+          placeholder="Имя#Трипкод"
           maxLength={MAX_NAME_LEGTH}
           defaultValue={defaultName}
           onChange={onNameChange}
@@ -265,6 +326,71 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         onPaste={onMessagePaste}
         ref={messageRef}
       ></textarea>
+
+      <div className="posting-form__markup">
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_bold"
+          title="Полужирный, Alt+B"
+          onClick={insertBold}
+        >
+          Тт
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_italic"
+          title="Курсив. Alt+I"
+          onClick={insertItalic}
+        >
+          Тт
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_underline"
+          title="Подчёркнутый"
+          onClick={insertUnderline}
+        >
+          Тт
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_strike"
+          title="Зачёркнутый, Alt+T"
+          onClick={insertStrike}
+        >
+          Тт
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_superscript"
+          title="Надстрочный"
+          onClick={insertSuperscript}
+        >
+          <sup>Тт</sup>
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_subscript"
+          title="Подстрочный"
+          onClick={insertSubscript}
+        >
+          <sub>Тт</sub>
+        </button>
+
+        <button
+          type="button"
+          className="posting-form__markup-button posting-form__markup-button_spoiler"
+          title="Спойлер, Alt+P"
+          onClick={insertSpoiler}
+        >
+          Спойлер
+        </button>
+      </div>
 
       <FileInput
         className="posting-form__files-row"
