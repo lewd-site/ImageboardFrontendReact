@@ -7,9 +7,12 @@ import { IndexPage } from './components/index-page';
 import { Layout } from './components/layout';
 import { Spinner } from './components/spinner';
 import { ThreadPage } from './components/thread-page';
+import { initFavicon } from './favicon';
 import settings, { Settings } from './settings';
 import { LocationGenerics } from './types';
 import '@lewd-site/components';
+
+initFavicon();
 
 function applySettings(settings: Settings) {
   if (settings.nsfw) {

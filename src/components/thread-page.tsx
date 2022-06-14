@@ -1,6 +1,7 @@
 import { useMatch } from '@tanstack/react-location';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Post } from '../domain';
+import { updateFavicon, updateTitle } from '../favicon';
 import { OWN_POST_IDS_CHANGED, storage } from '../storage';
 import { LocationGenerics } from '../types';
 import { SseThreadUpdater } from '../updater';
@@ -26,6 +27,20 @@ export function ThreadPage() {
     setPosts(posts);
   }, [initialPosts]);
 
+  const unreadPosts = useRef(0);
+  useEffect(() => {
+    function handler() {
+      if (!document.hidden) {
+        unreadPosts.current = 0;
+        updateTitle(unreadPosts.current);
+        updateFavicon(unreadPosts.current);
+      }
+    }
+
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, []);
+
   const { slug } = params;
   const parentId = Number(params.parentId.split('.').shift());
   useEffect(() => {
@@ -36,8 +51,19 @@ export function ThreadPage() {
           result.set(post.id, post);
         }
 
+        let newPostCount = 0;
         for (const post of newPosts) {
+          if (!result.has(post.id)) {
+            newPostCount++;
+          }
+
           result.set(post.id, post);
+        }
+
+        if (document.hidden) {
+          unreadPosts.current += newPostCount;
+          updateTitle(unreadPosts.current);
+          updateFavicon(unreadPosts.current);
         }
 
         return result;

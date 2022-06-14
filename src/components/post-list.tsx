@@ -5,7 +5,6 @@ import { Post } from './post';
 import { Lightbox } from './lightbox';
 import { eventBus } from '../event-bus';
 import { POST_CREATED } from '../events';
-import { storage } from '../storage';
 
 interface Rect {
   readonly width: number;
