@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect } from 'react';
+import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect, ReactNode } from 'react';
 
 interface FileInputProps {
   readonly className?: string;
@@ -61,15 +61,34 @@ export function FileInput({ className, onChange, setAddFiles, setClear }: FileIn
 
   const previews = useMemo(
     () =>
-      previewUrls.map((preview, index) => (
-        <div className="file-input__preview" title="Удалить файл" key={preview} onClick={() => removeFile(index)}>
-          <img className="file-input__preview-image" src={preview} alt="" />
+      previewUrls.map((preview, index) => {
+        const file = files.current[index];
 
-          <div className="file-input__preview-overlay">
-            <span className="icon icon_close"></span>
+        let img = null;
+        if (file.type.startsWith('image/')) {
+          img = <img className="file-input__preview-image" src={preview} alt="" />;
+        } else if (file.type.startsWith('audio/')) {
+          img = <img className="file-input__preview-image" src="/audio.png" alt="" />;
+        } else if (file.type.startsWith('video/')) {
+          img = (
+            <video className="file-input__preview-image" autoPlay loop muted>
+              <source type={file.type} src={preview} />
+            </video>
+          );
+        } else {
+          img = <div className="file-input__preview-image"></div>;
+        }
+
+        return (
+          <div className="file-input__preview" title="Удалить файл" key={preview} onClick={() => removeFile(index)}>
+            {img}
+
+            <div className="file-input__preview-overlay">
+              <span className="icon icon_close"></span>
+            </div>
           </div>
-        </div>
-      )),
+        );
+      }),
     [previewUrls]
   );
 

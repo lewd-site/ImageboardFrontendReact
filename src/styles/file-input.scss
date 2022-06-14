@@ -22,9 +22,7 @@
   &__preview-image {
     background: var(--foreground);
 
-    width: auto;
-    max-width: 60px;
-
+    width: 60px;
     height: 60px;
 
     object-fit: cover;
@@ -45,6 +43,8 @@
     background: rgba(#000, 0.3);
     opacity: 0;
     transition: opacity 200ms ease;
+
+    pointer-events: none;
 
     z-index: 1;
 
