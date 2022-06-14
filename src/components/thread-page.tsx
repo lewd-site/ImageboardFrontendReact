@@ -8,6 +8,24 @@ import { SseThreadUpdater } from '../updater';
 import { PostList } from './post-list';
 import { PostingFormModal } from './posting-form-modal';
 
+function isAtBottom() {
+  const { scrollingElement } = document;
+  if (scrollingElement === null) {
+    return false;
+  }
+
+  return scrollingElement.scrollTop > scrollingElement.scrollHeight - scrollingElement.clientHeight - 200;
+}
+
+function scrollToBottom() {
+  const { scrollingElement } = document;
+  if (scrollingElement === null) {
+    return;
+  }
+
+  scrollingElement.scrollTop = scrollingElement.scrollHeight;
+}
+
 export function ThreadPage() {
   const [posts, setPosts] = useState<Map<number, Post>>(new Map());
 
@@ -64,6 +82,11 @@ export function ThreadPage() {
           unreadPosts.current += newPostCount;
           updateTitle(unreadPosts.current);
           updateFavicon(unreadPosts.current);
+        } else {
+          const atBottom = isAtBottom();
+          if (atBottom) {
+            setTimeout(() => scrollToBottom(), 100);
+          }
         }
 
         return result;
