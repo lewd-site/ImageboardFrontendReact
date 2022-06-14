@@ -236,8 +236,8 @@ export async function browseBoards(): Promise<Board[]> {
   });
 }
 
-export async function browseThreads(slug: string): Promise<Thread[]> {
-  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads`);
+export async function browseThreads(slug: string, page: number = 0): Promise<Thread[]> {
+  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads?page=${page}`);
   const { items } = await response.json();
   if (!Array.isArray(items)) {
     throw new ApiError('items: array expected');
@@ -250,6 +250,21 @@ export async function browseThreads(slug: string): Promise<Thread[]> {
 
     return convertThreadDtoToThread(item);
   });
+}
+
+export async function browseAllThreads(slug: string): Promise<Thread[]> {
+  const result = [];
+
+  for (let page = 0; ; page++) {
+    const threads = await browseThreads(slug, page);
+    if (threads.length === 0) {
+      break;
+    }
+
+    result.push(...threads);
+  }
+
+  return result;
 }
 
 export async function browsePosts(slug: string, parentId: number): Promise<Post[]> {

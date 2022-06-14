@@ -1,7 +1,7 @@
 import { Outlet, ReactLocation, Route, Router } from '@tanstack/react-location';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { browseBoards, browsePosts, browseThreads } from './api';
+import { browseAllThreads, browseBoards, browsePosts } from './api';
 import { BoardPage } from './components/board-page';
 import { IndexPage } from './components/index-page';
 import { Layout } from './components/layout';
@@ -64,7 +64,7 @@ function createApp() {
         {
           path: ':slug',
           loader: async ({ params: { slug } }) => ({
-            threads: await browseThreads(slug),
+            threads: await browseAllThreads(slug),
           }),
           loaderMaxAge: 0,
           children: [
