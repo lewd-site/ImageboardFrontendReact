@@ -15,19 +15,10 @@ interface ThreadProps {
 }
 
 export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: ThreadProps) {
-  const name = !thread.name.length && !thread.tripcode.length ? DEFAULT_NAME : thread.name;
-  const files = useMemo(
-    () => thread.files.map((file, index) => <File file={file} key={index} onThumbnailClick={onThumbnailClick} />),
-    [thread.files, onThumbnailClick]
-  );
+  const header = useMemo(() => {
+    const name = !thread.name.length && !thread.tripcode.length ? DEFAULT_NAME : thread.name;
 
-  const markup = useMemo(
-    () => <Markup markup={thread.messageParsed} onReflinkClick={onReflinkClick} />,
-    [thread.messageParsed, onReflinkClick]
-  );
-
-  return (
-    <div id={`post_${thread.id}`} className={['post', className].join(' ')}>
+    return (
       <div className="post__header">
         <span className="post__subject">{thread.subject}</span>
 
@@ -52,16 +43,40 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
           </Link>
         </span>
       </div>
+    );
+  }, [thread.name, thread.tripcode, thread.createdAt, thread.slug, thread.id]);
 
+  const files = useMemo(
+    () => (
       <div
         className={[
           'post__files',
-          files.length === 1 ? 'post__files_single' : files.length > 1 ? 'post__files_multiple' : '',
+          thread.files.length === 1 ? 'post__files_single' : thread.files.length > 1 ? 'post__files_multiple' : '',
         ].join(' ')}
       >
-        {files}
+        {thread.files.map((file, index) => (
+          <File file={file} key={index} onThumbnailClick={onThumbnailClick} />
+        ))}
       </div>
-      <div className="post__message">{markup}</div>
+    ),
+    [thread.files, onThumbnailClick]
+  );
+
+  const markup = useMemo(
+    () => (
+      <div className="post__message">
+        <Markup markup={thread.messageParsed} onReflinkClick={onReflinkClick} />
+      </div>
+    ),
+    [thread.messageParsed, onReflinkClick]
+  );
+
+  return (
+    <div id={`post_${thread.id}`} className={['post', className].join(' ')}>
+      {header}
+      {files}
+      {markup}
+      <span className="post__footer">Ответов: {thread.postCount - 1}</span>
     </div>
   );
 }
