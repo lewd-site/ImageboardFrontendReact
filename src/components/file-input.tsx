@@ -101,6 +101,7 @@ export function FileInput({ className, onChange, setClear }: FileInputProps) {
           name="files"
           type="file"
           multiple
+          accept="image/webp,image/jpeg,image/png,image/gif,image/bmp,video/webm,video/mp4,audio/mpeg,audio/mp4,audio/flac,audio/x-flac,audio/wav,audio/x-wav,audio/vnd.wave"
           ref={filesRef}
           onChange={onFilesChange}
         />
