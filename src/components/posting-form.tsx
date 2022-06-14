@@ -1,4 +1,14 @@
-import { ChangeEvent, useCallback, useRef, useEffect, FormEvent, useState, useMemo, KeyboardEvent } from 'react';
+import {
+  ChangeEvent,
+  useCallback,
+  useRef,
+  useEffect,
+  FormEvent,
+  useState,
+  useMemo,
+  KeyboardEvent,
+  ClipboardEvent,
+} from 'react';
 import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
 import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
@@ -71,6 +81,10 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
 
   const subjectRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+
+  const addFiles = useRef((files: File[]) => {});
+  const setAddFiles = useCallback((fn: (files: File[]) => void) => (addFiles.current = fn), []);
+
   const clearFileInput = useRef(() => {});
   const setClearFileInput = useCallback((clear: () => void) => (clearFileInput.current = clear), []);
 
@@ -193,6 +207,14 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
     [submit]
   );
 
+  const onMessagePaste = useCallback((event: ClipboardEvent) => {
+    if (!event.clipboardData.files.length) {
+      return;
+    }
+
+    addFiles.current([...event.clipboardData.files]);
+  }, []);
+
   const onSubmit = useCallback(
     (event: FormEvent) => {
       event.preventDefault();
@@ -240,10 +262,16 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         defaultValue={defaultMessage}
         onChange={onMessageChange}
         onKeyDown={onMessageKeyDown}
+        onPaste={onMessagePaste}
         ref={messageRef}
       ></textarea>
 
-      <FileInput className="posting-form__files-row" setClear={setClearFileInput} onChange={onFilesChange} />
+      <FileInput
+        className="posting-form__files-row"
+        setAddFiles={setAddFiles}
+        setClear={setClearFileInput}
+        onChange={onFilesChange}
+      />
     </form>
   );
 }

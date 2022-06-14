@@ -3,29 +3,40 @@ import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect } from '
 interface FileInputProps {
   readonly className?: string;
   readonly onChange?: (files: File[]) => void;
+  readonly setAddFiles?: (addFiles: (files: File[]) => void) => void;
   readonly setClear?: (clear: () => void) => void;
 }
 
 const MAX_FILES = 5;
 
-export function FileInput({ className, onChange, setClear }: FileInputProps) {
+export function FileInput({ className, onChange, setAddFiles, setClear }: FileInputProps) {
   const files = useRef<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
-  const onFilesChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files === null) {
-      return;
-    }
+  const addFiles = useCallback(
+    (filesToAdd: File[]) => {
+      const newFiles = filesToAdd.slice(0, MAX_FILES - files.current.length);
+      files.current = files.current.concat(...newFiles);
 
-    const newFiles = [...event.target.files].slice(0, MAX_FILES - files.current.length);
-    files.current = files.current.concat(...newFiles);
+      setPreviewUrls((previews) => previews.concat(...newFiles.map((file) => URL.createObjectURL(file))));
 
-    setPreviewUrls((previews) => previews.concat(...newFiles.map((file) => URL.createObjectURL(file))));
+      if (typeof onChange !== 'undefined') {
+        onChange(files.current);
+      }
+    },
+    [onChange]
+  );
 
-    if (typeof onChange !== 'undefined') {
-      onChange(files.current);
-    }
-  }, []);
+  const onFilesChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (event.target.files === null) {
+        return;
+      }
+
+      addFiles([...event.target.files]);
+    },
+    [addFiles]
+  );
 
   const removeFile = useCallback((index: number) => {
     files.current.splice(index, 1);
@@ -83,10 +94,14 @@ export function FileInput({ className, onChange, setClear }: FileInputProps) {
   }, []);
 
   useEffect(() => {
+    if (typeof setAddFiles !== 'undefined') {
+      setAddFiles(addFiles);
+    }
+
     if (typeof setClear !== 'undefined') {
       setClear(clear);
     }
-  }, [setClear]);
+  }, [setAddFiles, setClear]);
 
   return (
     <div className={[className, 'file-input'].join(' ')}>
