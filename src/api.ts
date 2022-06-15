@@ -50,6 +50,13 @@ export interface PostDto {
   readonly created_at: string;
 }
 
+interface RequestOptions {
+  setCancel?: (cancel: () => void) => void;
+  onUploadProgress?: (sent: number, total: number, speed: number) => void;
+  onUploaded?: () => void;
+  onDownloadProgress?: (received: number, total: number, speed: number) => void;
+}
+
 const THUMB_WIDTH = 200;
 const THUMB_HEIGHT = 200;
 
@@ -283,13 +290,69 @@ export async function browsePosts(slug: string, parentId: number): Promise<Post[
   });
 }
 
+async function sendRequest(
+  url: string | URL,
+  body: FormData,
+  { setCancel, onUploadProgress, onUploaded, onDownloadProgress }: RequestOptions = {}
+): Promise<XMLHttpRequest> {
+  let now = Date.now();
+
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', url);
+  xhr.responseType = 'json';
+
+  return new Promise((resolve, reject) => {
+    if (typeof setCancel !== 'undefined') {
+      setCancel(() => {
+        xhr.abort();
+        reject(new ApiError('Отправка отменена'));
+      });
+    }
+
+    if (typeof onUploadProgress !== 'undefined') {
+      xhr.upload.addEventListener('progress', (event) => {
+        const elapsedSeconds = Math.max(1, Date.now() - now) / 1000;
+        const speed = event.loaded / elapsedSeconds;
+        onUploadProgress(event.loaded, event.total, speed);
+      });
+    }
+
+    if (typeof onUploaded !== 'undefined') {
+      xhr.upload.addEventListener('load', () => {
+        now = Date.now();
+        onUploaded();
+      });
+    }
+
+    if (typeof onDownloadProgress !== 'undefined') {
+      xhr.addEventListener('progress', (event) => {
+        const elapsedSeconds = Math.max(1, Date.now() - now) / 1000;
+        const speed = event.loaded / elapsedSeconds;
+        onDownloadProgress(event.loaded, event.total, speed);
+      });
+    }
+
+    xhr.addEventListener('load', () => {
+      resolve(xhr);
+    });
+
+    xhr.addEventListener('error', () => {
+      reject(new ApiError(`${xhr.status} ${xhr.statusText}`));
+    });
+
+    xhr.send(body);
+  });
+}
+
 export async function createThread(
   slug: string,
   subject: string,
   name: string,
   message: string,
-  files: File[]
+  files: File[],
+  options: RequestOptions = {}
 ): Promise<Thread> {
+  const url = new URL(`${config.api.baseUrl}/boards/${slug}/threads`);
   const body = new FormData();
   body.append('subject', subject);
   body.append('name', name);
@@ -298,12 +361,29 @@ export async function createThread(
     body.append('files', file, file.name);
   }
 
-  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads`, {
-    method: 'POST',
-    body,
-  });
+  const xhr = await sendRequest(url, body, options);
+  if (xhr.status === 400 && typeof xhr.response === 'object' && 'field' in xhr.response && 'message' in xhr.response) {
+    const fields: { [key: string]: string } = { subject: 'тема', name: 'имя', message: 'сообщение' } as const;
+    const fieldName = xhr.response.field;
+    const field = typeof fields[fieldName] !== 'undefined' ? fields[fieldName] : xhr.response.field;
+    switch (xhr.response.message) {
+      case 'mimetype':
+        throw new ApiError('Неподдерживаемый тип файла');
 
-  const { item } = await response.json();
+      case 'required':
+        throw new ApiError(`Поле ${field} обязательно для заполнения`);
+    }
+  }
+
+  if (xhr.status !== 201) {
+    throw new ApiError(`${xhr.status} ${xhr.statusText}`);
+  }
+
+  if (!('item' in xhr.response)) {
+    throw new ApiError(`Invalid response: ${JSON.stringify(xhr.response)}`);
+  }
+
+  const { item } = xhr.response;
   if (!isThreadDto(item)) {
     throw new ApiError(`Invalid thread DTO: ${JSON.stringify(item)}`);
   }
@@ -316,8 +396,10 @@ export async function createPost(
   parentId: number,
   name: string,
   message: string,
-  files: File[]
+  files: File[],
+  options: RequestOptions = {}
 ): Promise<Post> {
+  const url = new URL(`${config.api.baseUrl}/boards/${slug}/threads/${parentId}/posts`);
   const body = new FormData();
   body.append('name', name);
   body.append('message', message);
@@ -325,12 +407,29 @@ export async function createPost(
     body.append('files', file, file.name);
   }
 
-  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads/${parentId}/posts`, {
-    method: 'POST',
-    body,
-  });
+  const xhr = await sendRequest(url, body, options);
+  if (xhr.status === 400 && typeof xhr.response === 'object' && 'field' in xhr.response && 'message' in xhr.response) {
+    const fields: { [key: string]: string } = { name: 'имя', message: 'сообщение' } as const;
+    const fieldName = xhr.response.field;
+    const field = typeof fields[fieldName] !== 'undefined' ? fields[fieldName] : xhr.response.field;
+    switch (xhr.response.message) {
+      case 'mimetype':
+        throw new ApiError('Неподдерживаемый тип файла');
 
-  const { item } = await response.json();
+      case 'required':
+        throw new ApiError(`Поле ${field} обязательно для заполнения`);
+    }
+  }
+
+  if (xhr.status !== 201) {
+    throw new ApiError(`${xhr.status} ${xhr.statusText}`);
+  }
+
+  if (!('item' in xhr.response)) {
+    throw new ApiError(`Invalid response: ${JSON.stringify(xhr.response)}`);
+  }
+
+  const { item } = xhr.response;
   if (!isPostDto(item)) {
     throw new ApiError(`Invalid post DTO: ${JSON.stringify(item)}`);
   }

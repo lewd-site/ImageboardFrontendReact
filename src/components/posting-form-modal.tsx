@@ -18,7 +18,7 @@ const POSTING_FORM_WIDTH = 'posting-form.width';
 const POSTING_FORM_HEIGHT = 'posting-form.height';
 
 const MODAL_MIN_WIDTH = 400;
-const MODAL_MIN_HEIGHT = 250;
+const MODAL_MIN_HEIGHT = 280;
 
 const MOBILE_MAX_WIDTH = 600;
 

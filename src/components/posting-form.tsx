@@ -13,6 +13,7 @@ import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
 import { INSERT_MARKUP, INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { storage } from '../storage';
+import { formatFileSize, formatUploadProgress } from '../utils';
 import { FileInput } from './file-input';
 
 interface PostingFormProps {
@@ -77,6 +78,8 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const onFilesChange = useCallback((value: File[]) => (files.current = value), []);
 
   const [submitting, setSubmitting] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [progressText, setProgressText] = useState('Отправка поста...');
   const [error, setError] = useState<any>(null);
 
   const subjectRef = useRef<HTMLInputElement>(null);
@@ -192,21 +195,50 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
     event.stopPropagation();
   }, []);
 
+  const cancelSubmit = useRef(() => {});
+  const setCancelSubmit = useCallback((fn: () => void) => (cancelSubmit.current = fn), []);
+  const onCancelClick = useCallback(() => cancelSubmit.current(), []);
+
   const submit = useCallback(async () => {
     if (submitting) {
       return;
     }
 
+    setProgress(0);
+    setProgressText('Отправка поста...');
     setSubmitting(true);
     setError(null);
 
     try {
+      const requestOptions = {
+        onUploadProgress: (sent: number, total: number, speed: number) => {
+          const percent = ((100 * sent) / total).toFixed(2);
+          const progress = formatUploadProgress(sent, total);
+          setProgress(Number(percent));
+          setProgressText(`Отправка поста... ${percent}%\n${progress}, ${formatFileSize(speed)}/с`);
+        },
+        onDownloadProgress: (received: number, total: number, speed: number) => {
+          const percent = ((100 * received) / total).toFixed(2);
+          const progress = formatUploadProgress(received, total);
+          setProgress(Number(percent));
+          setProgressText(`Получение данных... ${percent}%\n${progress}, ${formatFileSize(speed)}/с`);
+        },
+        setCancel: setCancelSubmit,
+      };
+
       if (parentId === null) {
-        const thread = await createThread(slug, subject.current, name.current, message.current, files.current);
+        const thread = await createThread(
+          slug,
+          subject.current,
+          name.current,
+          message.current,
+          files.current,
+          requestOptions
+        );
         eventBus.dispatch(THREAD_CREATED, thread);
         storage.addOwnPost({ parent_id: null, id: thread.id });
       } else {
-        const post = await createPost(slug, parentId, name.current, message.current, files.current);
+        const post = await createPost(slug, parentId, name.current, message.current, files.current, requestOptions);
         eventBus.dispatch(POST_CREATED, post);
         storage.addOwnPost({ parent_id: post.parentId, id: post.id });
       }
@@ -231,7 +263,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       setError(e);
       console.error(e); // TODO: show notification
     } finally {
-      setSubmitting(false);
+      setTimeout(() => setSubmitting(false));
     }
   }, [submitting, slug, parentId]);
 
@@ -398,6 +430,20 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         setClear={setClearFileInput}
         onChange={onFilesChange}
       />
+
+      {submitting ? (
+        <div className="posting-form__progress-wrapper">
+          {progressText}
+
+          <div className="posting-form__progress">
+            <div className="posting-form__progress-bar" style={{ width: `${progress}%` }}></div>
+          </div>
+
+          <button className="button" onClick={onCancelClick}>
+            Отменить
+          </button>
+        </div>
+      ) : null}
     </form>
   );
 }

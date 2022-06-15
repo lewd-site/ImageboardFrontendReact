@@ -71,7 +71,7 @@ export function FileInput({ className, onChange, setAddFiles, setClear }: FileIn
           img = <img className="file-input__preview-image" src="/audio.png" alt="" />;
         } else if (file.type.startsWith('video/')) {
           img = (
-            <video className="file-input__preview-image" autoPlay loop muted>
+            <video className="file-input__preview-image" autoPlay={true} loop={true} muted={true}>
               <source type={file.type} src={preview} />
             </video>
           );

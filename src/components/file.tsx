@@ -1,5 +1,6 @@
 import { useCallback, MouseEvent, useMemo } from 'react';
 import { File as FileModel } from '../domain';
+import { formatFileSize } from '../utils';
 
 interface FileProps {
   readonly file: FileModel;
@@ -13,17 +14,6 @@ const AUDIO_THUMB_HEIGHT = 96;
 
 const MAX_THUMB_WIDTH = 200;
 const MAX_THUMB_HEIGHT = 200;
-
-const units = ['', 'К', 'М', 'Г', 'Т', 'П'];
-
-function formatFileSize(value: number): string {
-  if (value < 1024) {
-    return `${value} байт`;
-  }
-
-  const unitIndex = Math.floor((31 - Math.clz32(value)) / 10);
-  return `${(value / Math.pow(1024, unitIndex)).toFixed(2)} ${units[unitIndex]}байт`;
-}
 
 export function File({ file, onThumbnailClick }: FileProps) {
   const width = file.width || AUDIO_THUMB_WIDTH;
