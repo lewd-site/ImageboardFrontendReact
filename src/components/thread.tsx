@@ -4,6 +4,7 @@ import { Markup } from './markup';
 import { File } from './file';
 import { Link } from '@tanstack/react-location';
 import { TimeAgo } from './time-ago';
+import { Post } from './post';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -76,7 +77,14 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
       {header}
       {files}
       {markup}
-      <span className="post__footer">Ответов: {thread.postCount - 1}</span>
+      {thread.postCount - thread.replies.length > 1 && (
+        <div className="post__omitted-replies">Пропущено ответов: {thread.postCount - thread.replies.length - 1}</div>
+      )}
+      <div className="post__replies">
+        {thread.replies.map((post) => (
+          <Post className="post__replies-item" post={post} key={post.id} />
+        ))}
+      </div>
     </div>
   );
 }

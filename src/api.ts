@@ -35,6 +35,7 @@ export interface ThreadDto {
   readonly created_at: string;
   readonly bumped_at: string;
   readonly post_count: number;
+  readonly replies: PostDto[];
 }
 
 export interface PostDto {
@@ -210,6 +211,7 @@ export function convertThreadDtoToThread(thread: ThreadDto): Thread {
     createdAt: new Date(thread.created_at),
     bumpedAt: new Date(thread.bumped_at),
     postCount: thread.post_count,
+    replies: thread.replies.map(convertPostDtoToPost),
   };
 }
 

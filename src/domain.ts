@@ -90,6 +90,7 @@ export interface Thread {
   readonly createdAt: Date;
   readonly bumpedAt: Date;
   readonly postCount: number;
+  readonly replies: Post[];
 }
 
 export interface Post {

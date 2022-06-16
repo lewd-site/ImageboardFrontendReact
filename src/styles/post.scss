@@ -108,8 +108,21 @@
     }
   }
 
-  &__footer {
+  &__omitted-replies {
     opacity: 0.8;
     font-size: 14px;
+
+    margin-bottom: 8px;
+  }
+
+  &__replies-item {
+    border-left: 2px solid rgba($foreground, 0.5);
+
+    padding-left: 8px;
+    margin-bottom: 16px;
+
+    &_own {
+      border-left: 2px dashed rgba($foreground, 0.5);
+    }
   }
 }
