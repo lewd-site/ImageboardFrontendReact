@@ -104,8 +104,10 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
             }
 
           case 'link':
+            const target = node.url.match(`^(?:https?:\/\/)?(?:www\.)?youtube\.com`) !== null ? 'youtube' : '_blank';
+
             return (
-              <a className="link" href={node.url} target="_blank" rel="ugc" key={index}>
+              <a className="link" href={node.url} target={target} rel="ugc" key={index}>
                 {node.text}
               </a>
             );
