@@ -259,11 +259,11 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
 
       localStorage.setItem(SUBJECT, subject.current);
       localStorage.setItem(MESSAGE, message.current);
+
+      setTimeout(() => setSubmitting(false));
     } catch (e) {
       setError(e);
-      console.error(e); // TODO: show notification
-    } finally {
-      setTimeout(() => setSubmitting(false));
+      setTimeout(() => setSubmitting(false), 2000);
     }
   }, [submitting, slug, parentId]);
 
@@ -433,15 +433,21 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
 
       {submitting ? (
         <div className="posting-form__progress-wrapper">
-          {progressText}
+          {error !== null ? (
+            <>Ошибка: {error.message}</>
+          ) : (
+            <>
+              {progressText}
 
-          <div className="posting-form__progress">
-            <div className="posting-form__progress-bar" style={{ width: `${progress}%` }}></div>
-          </div>
+              <div className="posting-form__progress">
+                <div className="posting-form__progress-bar" style={{ width: `${progress}%` }}></div>
+              </div>
 
-          <button className="button" onClick={onCancelClick}>
-            Отменить
-          </button>
+              <button className="button" onClick={onCancelClick}>
+                Отменить
+              </button>
+            </>
+          )}
         </div>
       ) : null}
     </form>
