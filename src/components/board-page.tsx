@@ -57,7 +57,7 @@ export function BoardPage() {
         });
       }
     },
-    [lightboxVisible]
+    [file, lightboxVisible]
   );
 
   const onLightboxClose = useCallback(() => setLightboxVisible(false), []);

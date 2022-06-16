@@ -82,7 +82,7 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
       )}
       <div className="post__replies">
         {thread.replies.map((post) => (
-          <Post className="post__replies-item" post={post} key={post.id} />
+          <Post className="post__replies-item" post={post} key={post.id} onThumbnailClick={onThumbnailClick} />
         ))}
       </div>
     </div>
