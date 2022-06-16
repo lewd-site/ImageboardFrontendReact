@@ -43,6 +43,17 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
     return () => elementRef.current?.removeEventListener('wheel', handle);
   });
 
+  const audioPlayerRef = useRef<any>(null);
+  useEffect(() => {
+    function handle(event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    audioPlayerRef.current?.addEventListener('pointerdown', handle);
+    return () => audioPlayerRef.current?.removeEventListener('pointerdown', handle);
+  });
+
   const onEnter = useCallback(() => setLightboxVisible(true), []);
   const onExited = useCallback(() => setLightboxVisible(false), []);
 
@@ -115,7 +126,7 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
 
       if (
         typeof onClose !== 'undefined' &&
-        file?.type.startsWith('image/') &&
+        (file?.type.startsWith('image/') || file?.type.startsWith('audio/')) &&
         Math.abs(dragStartPosition.current.x - data.x) < 1 &&
         Math.abs(dragStartPosition.current.y - data.y) < 1
       ) {
@@ -240,6 +251,7 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
           {lightboxVisible && (
             <audio-player
               class="lightbox__audio"
+              ref={audioPlayerRef}
               autoplay={true}
               loop={true}
               src={file.originalUrl}
