@@ -316,6 +316,88 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
     [submit]
   );
 
+  const hideDropOverlayTimeout = useRef<any>(null);
+  const [dropOverlayVisible, setDropOverlayVisible] = useState(false);
+  useEffect(() => {
+    function onDragEnter(event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (hideDropOverlayTimeout.current !== null) {
+        clearTimeout(hideDropOverlayTimeout.current);
+        hideDropOverlayTimeout.current = null;
+      }
+
+      setDropOverlayVisible(true);
+    }
+
+    function onDragOver(event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (hideDropOverlayTimeout.current !== null) {
+        clearTimeout(hideDropOverlayTimeout.current);
+        hideDropOverlayTimeout.current = null;
+      }
+
+      setDropOverlayVisible(true);
+    }
+
+    function onDragLeave(event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (hideDropOverlayTimeout.current !== null) {
+        clearTimeout(hideDropOverlayTimeout.current);
+        hideDropOverlayTimeout.current = null;
+      }
+
+      hideDropOverlayTimeout.current = setTimeout(() => {
+        setDropOverlayVisible(false);
+        hideDropOverlayTimeout.current = null;
+      }, 100);
+    }
+
+    function onDrop(event: DragEvent) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (hideDropOverlayTimeout.current !== null) {
+        clearTimeout(hideDropOverlayTimeout.current);
+        hideDropOverlayTimeout.current = null;
+      }
+
+      hideDropOverlayTimeout.current = setTimeout(() => {
+        setDropOverlayVisible(false);
+        hideDropOverlayTimeout.current = null;
+      }, 100);
+
+      if (event.dataTransfer === null) {
+        return;
+      }
+
+      const files: File[] = [];
+      const fileList = event.dataTransfer.files;
+      for (let i = 0; i < fileList.length; i++) {
+        files.push(fileList[i]);
+      }
+
+      addFiles.current(files);
+    }
+
+    formRef.current?.addEventListener('dragenter', onDragEnter);
+    formRef.current?.addEventListener('dragover', onDragOver);
+    formRef.current?.addEventListener('dragleave', onDragLeave);
+    formRef.current?.addEventListener('drop', onDrop);
+
+    return () => {
+      formRef.current?.removeEventListener('dragenter', onDragEnter);
+      formRef.current?.removeEventListener('dragover', onDragOver);
+      formRef.current?.removeEventListener('dragleave', onDragLeave);
+      formRef.current?.removeEventListener('drop', onDrop);
+    };
+  }, [formRef.current]);
+
   return (
     <form className={[className, 'posting-form'].join(' ')} onKeyDown={onKeyDown} onSubmit={onSubmit} ref={formRef}>
       {showSubject && (
@@ -430,6 +512,15 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         setClear={setClearFileInput}
         onChange={onFilesChange}
       />
+
+      <div
+        className={[
+          'posting-form__drop-wrapper',
+          dropOverlayVisible ? 'posting-form__drop-wrapper_visible' : 'posting-form__drop-wrapper_hidden',
+        ].join(' ')}
+      >
+        <span className="icon icon_download"></span>
+      </div>
 
       {submitting ? (
         <div className="posting-form__progress-wrapper">
