@@ -5,7 +5,7 @@
 
   &__row {
     &_even {
-      background-color: #43474f;
+      background-color: var(--table-alternate-row);
     }
   }
 

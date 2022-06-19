@@ -24,6 +24,7 @@
   }
 
   &__show-menu,
+  &__show-settings,
   &__show-post-form {
     display: flex;
     flex-flow: row nowrap;
@@ -42,25 +43,26 @@
     padding: 0 8px;
 
     .icon {
-      color: #9da2b2;
+      color: var(--icon);
       font-size: 18px;
     }
 
     &:hover {
       .icon {
-        color: var(--foreground);
+        color: var(--icon-hover);
       }
     }
   }
 
+  &__show-settings,
   &__show-menu {
     &:hover {
       background: none;
     }
   }
 
-  @media screen and (min-width: 1200px) {
-    &__show-menu {
+  &__show-menu {
+    @media screen and (min-width: 1200px) {
       display: none;
     }
   }
@@ -68,6 +70,10 @@
   &__show-post-form {
     .icon {
       margin-right: 8px;
+    }
+
+    &:hover {
+      background: var(--fab);
     }
   }
 }

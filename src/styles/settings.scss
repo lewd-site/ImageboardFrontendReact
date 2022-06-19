@@ -1,0 +1,47 @@
+.settings {
+  &__title {
+    color: var(--foreground);
+
+    font-size: 18px;
+    font-weight: 700;
+
+    margin-bottom: 8px;
+  }
+
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: none;
+    border: 0;
+    border-radius: 0;
+
+    font-size: 18px;
+
+    width: 24px;
+    height: 24px;
+
+    padding: 0;
+
+    &:hover {
+      background: none;
+
+      .icon {
+        color: var(--icon-hover);
+      }
+    }
+  }
+
+  &__row {
+    margin-bottom: 8px;
+  }
+
+  &__theme-label {
+    margin-right: 8px;
+  }
+}

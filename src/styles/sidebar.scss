@@ -23,13 +23,11 @@
       background: none;
 
       .icon {
-        color: #cfd4e3;
+        color: var(--icon-hover);
       }
     }
-  }
 
-  @media screen and (min-width: 1200px) {
-    &__close {
+    @media screen and (min-width: 1200px) {
       display: none;
     }
   }
@@ -54,7 +52,7 @@
     align-items: center;
     border-radius: 50px;
 
-    background-color: none;
+    background: none;
     color: var(--foreground);
 
     font-size: 18px;
@@ -66,17 +64,17 @@
     transition: background-color 100ms ease;
 
     .icon {
-      color: #9da2b2;
+      color: var(--icon);
 
       margin-right: 8px;
     }
 
     &.active,
     &:hover {
-      background-color: #303339;
+      background: var(--fab);
 
       .icon {
-        color: var(--foreground);
+        color: var(--icon-hover);
       }
     }
   }

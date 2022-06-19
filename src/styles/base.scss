@@ -6,14 +6,16 @@ html,
 body {
   @extend %scrollbar;
 
-  background: var(--background);
-
   color: var(--foreground);
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
   line-height: 1.5;
 
   overscroll-behavior: none;
+}
+
+body {
+  background: var(--background);
 }
 
 h1,
@@ -55,12 +57,12 @@ picture {
 button,
 input[type='button'],
 .button {
-  background: #43474f;
+  background: var(--button);
 
   border: 0;
   border-radius: 3px;
 
-  color: #9da2b2;
+  color: var(--button-text);
   text-decoration: none;
 
   height: 24px;
@@ -70,7 +72,7 @@ input[type='button'],
   transition: background-color 100ms ease;
 
   &:hover {
-    background: #303339;
+    background: var(--button-hover);
   }
 }
 

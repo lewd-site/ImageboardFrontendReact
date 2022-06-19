@@ -246,7 +246,7 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
         <div className="lightbox__audio-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
           <picture className="lightbox__picture">
             <source srcSet={file.fallbackThumbnailUrl} type={file.fallbackThumbnailType} />
-            <img className="file__image" src={file.thumbnailUrl} alt="" />
+            <img className="lightbox__image" src={file.thumbnailUrl} alt="" />
           </picture>
           {lightboxVisible && (
             <audio-player

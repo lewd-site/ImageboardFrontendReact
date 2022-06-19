@@ -12,13 +12,13 @@
   }
 
   &__item {
-    border-left: 2px solid rgba($foreground, 0.5);
+    border-left: 2px solid var(--border);
 
     padding-left: 8px;
     margin-bottom: 16px;
 
     &_own {
-      border-left: 2px dashed rgba($foreground, 0.5);
+      border-left: 2px dashed var(--border);
     }
   }
 }

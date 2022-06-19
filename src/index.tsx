@@ -15,6 +15,17 @@ import '@lewd-site/components';
 initFavicon();
 
 function applySettings(settings: Settings) {
+  const themeClassName = `theme_${settings.theme}`;
+  for (const className of document.body.classList) {
+    if (className.startsWith('theme_') && className !== themeClassName) {
+      document.body.classList.remove(className);
+    }
+  }
+
+  if (!document.body.classList.contains(themeClassName)) {
+    document.body.classList.add(themeClassName);
+  }
+
   if (settings.nsfw) {
     document.body.classList.add('nsfw');
   } else {

@@ -1,9 +1,87 @@
 $background: #36393f;
-$foreground: #eee;
+$foreground: #eeeeee;
+$border: rgba($foreground, 0.5);
 $primary: #ea73f4;
+$block: #36393f;
 
-:root {
+$icon: #9da2b2;
+$icon-hover: #cfd4e3;
+
+$button: #43474f;
+$button-text: #9da2b2;
+$button-hover: #292b30;
+
+$fab: #303339;
+$input: #3e4249;
+$table-alternate-row: #43474f;
+
+$yotsuba_background: #eef2ff;
+$yotsuba_foreground: #000000;
+$yotsuba_border: rgba($yotsuba_foreground, 0.5);
+$yotsuba_primary: #34345c;
+$yotsuba_block: #d6daf0;
+
+$yotsuba_icon: lighten(#34345c, 10%);
+$yotsuba_icon-hover: darken(#34345c, 10%);
+
+$yotsuba_button: #ffffff;
+$yotsuba_button-text: #333333;
+$yotsuba_button-hover: #e6e6e6;
+
+$yotsuba_fab: #d6daf0;
+$yotsuba_input: #ffffff;
+$yotsuba_table-alternate-row: #d6daf0;
+
+@mixin theme_default {
   --background: #{$background};
   --foreground: #{$foreground};
+  --border: #{$border};
   --primary: #{$primary};
+  --block: #{$block};
+
+  --icon: #{$icon};
+  --icon-hover: #{$icon-hover};
+
+  --button: #{$button};
+  --button-text: #{$button-text};
+  --button-hover: #{$button-hover};
+
+  --fab: #{$fab};
+  --input: #{$input};
+  --table-alternate-row: #{$table-alternate-row};
+}
+
+@mixin theme_yotsuba {
+  --background: #{$yotsuba_background};
+  --foreground: #{$yotsuba_foreground};
+  --border: #{$yotsuba_border};
+  --primary: #{$yotsuba_primary};
+  --block: #{$yotsuba_block};
+
+  --icon: #{$yotsuba_icon};
+  --icon-hover: #{$yotsuba_icon-hover};
+
+  --button: #{$yotsuba_button};
+  --button-text: #{$yotsuba_button-text};
+  --button-hover: #{$yotsuba_button-hover};
+
+  --fab: #{$yotsuba_fab};
+  --input: #{$yotsuba_input};
+  --table-alternate-row: #{$yotsuba_table-alternate-row};
+}
+
+.theme_default {
+  @include theme_default;
+}
+
+.theme_yotsuba {
+  @include theme_yotsuba;
+}
+
+:root {
+  @include theme_default;
+
+  @media screen and (prefers-color-scheme: light) {
+    @include theme_yotsuba;
+  }
 }

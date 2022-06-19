@@ -39,7 +39,7 @@
   display: flex !important;
   flex-flow: column nowrap;
 
-  background: var(--background);
+  background: var(--block);
   border-radius: 4px;
   box-shadow: 0 0 8px 0 rgba(#000, 0.1);
 
@@ -72,6 +72,7 @@
     border: 0;
     border-radius: 0;
 
+    color: var(--icon);
     font-size: 18px;
 
     width: 24px;
@@ -83,7 +84,7 @@
       background: none;
 
       .icon {
-        color: #cfd4e3;
+        color: var(--icon-hover);
       }
     }
   }

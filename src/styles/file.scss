@@ -3,7 +3,7 @@
 
   &_audio,
   &_video {
-    border: 2px dashed #eee;
+    border: 2px dashed var(--foreground);
   }
 
   &__link {
@@ -20,7 +20,7 @@
   }
 
   &__picture {
-    background: var(--foreground);
+    background: #eeeeee;
     transition: opacity 200ms ease;
   }
 

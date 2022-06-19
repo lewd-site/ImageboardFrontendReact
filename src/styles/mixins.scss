@@ -1,20 +1,20 @@
 %scrollbar {
-  scrollbar-color: #9da2b2 #303339;
+  scrollbar-color: var(--icon) var(--fab);
   scrollbar-width: thin;
 
   &::-webkit-scrollbar {
-    background: #303339;
+    background: var(--fab);
 
     width: 8px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #9da2b2;
+    background: var(--icon);
 
     transition: background-color 100ms ease;
 
     &:hover {
-      background: #cfd4e3;
+      background: var(--icon-hover);
     }
   }
 }

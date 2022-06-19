@@ -20,7 +20,7 @@
   &__subject,
   &__name,
   &__message {
-    background: #3e4249;
+    background: var(--input);
     border: 0;
     border-radius: 4px;
 
@@ -46,6 +46,7 @@
     border: 0;
     border-radius: 0;
 
+    color: var(--icon);
     font-size: 18px;
 
     width: 24px;
@@ -57,7 +58,7 @@
       background: none;
 
       .icon {
-        color: #cfd4e3;
+        color: var(--icon-hover);
       }
     }
   }
@@ -116,7 +117,7 @@
     }
 
     &:hover {
-      background: #292b30;
+      background: var(--button-hover);
     }
   }
 
@@ -147,7 +148,7 @@
     }
 
     .icon {
-      color: #cfd4e3;
+      color: var(--icon-hover);
       font-size: 24px;
     }
   }
@@ -178,7 +179,7 @@
 
     display: block;
 
-    background: #9da2b2;
+    background: var(--icon);
     border-radius: 4px;
 
     width: 100%;

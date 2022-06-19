@@ -49,7 +49,7 @@
     z-index: 1;
 
     .icon {
-      color: #9da2b2;
+      color: var(--icon);
     }
   }
 
@@ -68,7 +68,7 @@
     cursor: pointer;
 
     .icon {
-      color: #9da2b2;
+      color: var(--icon);
       font-size: 18px;
 
       margin: 0 4px;
@@ -76,7 +76,7 @@
 
     &:hover {
       .icon {
-        color: #cfd4e3;
+        color: var(--icon-hover);
       }
     }
   }
