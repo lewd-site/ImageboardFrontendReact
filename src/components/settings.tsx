@@ -21,14 +21,21 @@ const THEMES = [
 export function Settings() {
   const hideSettings = useCallback(() => eventBus.dispatch(HIDE_SETTINGS), []);
 
+  const [nsfw, setNSFW] = useState(settings.nsfw);
   const [theme, setTheme] = useState(settings.theme);
 
   useEffect(() => {
     function handler(settings: SettingsModel) {
+      setNSFW(settings.nsfw);
       setTheme(settings.theme);
     }
 
     return settings.subscribe(handler);
+  }, []);
+
+  const onNSFWChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    setNSFW(event.target.checked);
+    settings.nsfw = event.target.checked;
   }, []);
 
   const onThemeChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
@@ -54,6 +61,13 @@ export function Settings() {
               </option>
             ))}
           </select>
+        </label>
+      </div>
+
+      <div className="settings__row">
+        <label className="settings__nsfw">
+          <span className="settings__nsfw-label">NSFW-режим</span>
+          <input type="checkbox" className="settings__nsfw-input" checked={nsfw} onChange={onNSFWChange} />
         </label>
       </div>
     </div>
