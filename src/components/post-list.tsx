@@ -118,7 +118,8 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
   });
 
   const onReflinkClick = useCallback(
-    (id: number) =>
+    (id: number, parentId?: number, slug?: string) =>
+      // TODO: check if post is in the current thread
       virtualizer.scrollToIndex(
         posts.findIndex((post) => post.id === id),
         { align: 'auto' }

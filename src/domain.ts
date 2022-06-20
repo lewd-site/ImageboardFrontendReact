@@ -41,6 +41,8 @@ interface LinkNode {
 interface RefLinkNode {
   readonly type: 'reflink';
   readonly postID: number;
+  readonly threadID?: number;
+  readonly slug?: string;
 }
 
 interface DiceNode {

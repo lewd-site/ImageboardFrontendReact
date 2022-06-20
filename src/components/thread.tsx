@@ -12,7 +12,7 @@ interface ThreadProps {
   readonly className?: string;
   readonly thread: ThreadModel;
   readonly ownPostIds?: number[];
-  readonly onReflinkClick?: (id: number) => void;
+  readonly onReflinkClick?: (id: number, parentId?: number, slug?: string) => void;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
 
