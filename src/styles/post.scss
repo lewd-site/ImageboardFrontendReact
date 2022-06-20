@@ -117,9 +117,18 @@
 
   &__replies-item {
     border-left: 2px solid var(--border);
+    border-radius: 2px;
+    background: var(--block);
 
-    padding-left: 8px;
+    width: 100%;
+
+    padding: 8px;
     margin-bottom: 16px;
+
+    @media screen and (min-width: 600px) {
+      width: fit-content;
+      min-width: 60%;
+    }
 
     &_own {
       border-left: 2px dashed var(--border);

@@ -68,10 +68,10 @@ export function BoardPage() {
     }
 
     return (
-      <div className="board-page__threads post-list">
+      <div className="board-page__threads thread-list">
         <h2 className="board-page__title">Список тредов</h2>
         {threads.map((thread) => (
-          <Thread key={thread.id} className="post-list__item" thread={thread} onThumbnailClick={onThumbnailClick} />
+          <Thread key={thread.id} className="thread-list__item" thread={thread} onThumbnailClick={onThumbnailClick} />
         ))}
       </div>
     );
