@@ -16,6 +16,16 @@ initFavicon();
 
 function applySettings(settings: Settings) {
   const themeClassName = `theme_${settings.theme}`;
+  for (const className of document.documentElement.classList) {
+    if (className.startsWith('theme_') && className !== themeClassName) {
+      document.documentElement.classList.remove(className);
+    }
+  }
+
+  if (!document.documentElement.classList.contains(themeClassName)) {
+    document.documentElement.classList.add(themeClassName);
+  }
+
   for (const className of document.body.classList) {
     if (className.startsWith('theme_') && className !== themeClassName) {
       document.body.classList.remove(className);

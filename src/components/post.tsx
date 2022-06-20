@@ -11,11 +11,12 @@ const DEFAULT_NAME = 'Anonymous';
 interface PostProps {
   readonly className?: string;
   readonly post: PostModel;
+  readonly ownPostIds?: number[];
   readonly onReflinkClick?: (id: number) => void;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
 
-export function Post({ className, post, onReflinkClick, onThumbnailClick }: PostProps) {
+export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailClick }: PostProps) {
   const onReplyClick = useCallback(() => {
     eventBus.dispatch(INSERT_QUOTE, post.id);
   }, [post.id]);
@@ -46,10 +47,10 @@ export function Post({ className, post, onReflinkClick, onThumbnailClick }: Post
   const message = useMemo(
     () => (
       <div className="post__message">
-        <Markup markup={post.messageParsed} onReflinkClick={onReflinkClick} />
+        <Markup markup={post.messageParsed} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />
       </div>
     ),
-    [post.messageParsed, onReflinkClick]
+    [post.messageParsed, ownPostIds, onReflinkClick]
   );
 
   const files = useMemo(

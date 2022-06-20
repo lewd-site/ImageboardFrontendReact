@@ -42,6 +42,12 @@ a,
   text-decoration: underline;
 }
 
+.reflink {
+  &_own::after {
+    content: ' (You)';
+  }
+}
+
 code,
 .code {
   font-family: 'Fira Code', monospace;

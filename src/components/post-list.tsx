@@ -220,6 +220,7 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
                   : '',
               ].join(' ')}
               post={posts[virtualRow.index]}
+              ownPostIds={ownPostIds}
               onReflinkClick={onReflinkClick}
               onThumbnailClick={onThumbnailClick}
             />

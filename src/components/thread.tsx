@@ -11,11 +11,12 @@ const DEFAULT_NAME = 'Anonymous';
 interface ThreadProps {
   readonly className?: string;
   readonly thread: ThreadModel;
+  readonly ownPostIds?: number[];
   readonly onReflinkClick?: (id: number) => void;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
 
-export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: ThreadProps) {
+export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbnailClick }: ThreadProps) {
   const header = useMemo(() => {
     const name = !thread.name.length && !thread.tripcode.length ? DEFAULT_NAME : thread.name;
 
@@ -66,10 +67,10 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
   const markup = useMemo(
     () => (
       <div className="post__message">
-        <Markup markup={thread.messageParsed} onReflinkClick={onReflinkClick} />
+        <Markup markup={thread.messageParsed} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />
       </div>
     ),
-    [thread.messageParsed, onReflinkClick]
+    [thread.messageParsed, ownPostIds, onReflinkClick]
   );
 
   return (
@@ -82,7 +83,13 @@ export function Thread({ className, thread, onReflinkClick, onThumbnailClick }: 
       )}
       <div className="post__replies">
         {thread.replies.map((post) => (
-          <Post className="post__replies-item" post={post} key={post.id} onThumbnailClick={onThumbnailClick} />
+          <Post
+            className="post__replies-item"
+            key={post.id}
+            post={post}
+            ownPostIds={ownPostIds}
+            onThumbnailClick={onThumbnailClick}
+          />
         ))}
       </div>
     </div>

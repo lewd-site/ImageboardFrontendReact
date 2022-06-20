@@ -3,10 +3,11 @@ import { Markup as MarkupModel } from '../domain';
 
 export interface MarkupProps {
   readonly markup: MarkupModel[];
+  readonly ownPostIds?: number[];
   readonly onReflinkClick?: (id: number) => void;
 }
 
-export function Markup({ markup, onReflinkClick }: MarkupProps) {
+export function Markup({ markup, ownPostIds, onReflinkClick }: MarkupProps) {
   return (
     <>
       {markup.map((node, index) => {
@@ -18,7 +19,7 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
             return node.text;
 
           case 'style':
-            const children = <Markup markup={node.children} onReflinkClick={onReflinkClick} />;
+            const children = <Markup markup={node.children} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />;
 
             switch (node.style) {
               case 'bold':
@@ -113,7 +114,7 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
             );
 
           case 'reflink':
-            return <Reflink postID={node.postID} onReflinkClick={onReflinkClick} key={index} />;
+            return <Reflink key={index} postID={node.postID} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />;
 
           case 'dice':
             let result = node.result.join(', ');
@@ -144,10 +145,11 @@ export function Markup({ markup, onReflinkClick }: MarkupProps) {
 
 interface ReflinkProps {
   readonly postID: number;
+  readonly ownPostIds?: number[];
   readonly onReflinkClick?: (id: number) => void;
 }
 
-function Reflink({ postID, onReflinkClick }: ReflinkProps) {
+function Reflink({ postID, ownPostIds, onReflinkClick }: ReflinkProps) {
   const onClick = useCallback(
     (event: MouseEvent) => {
       if (typeof onReflinkClick !== 'undefined') {
@@ -159,7 +161,12 @@ function Reflink({ postID, onReflinkClick }: ReflinkProps) {
   );
 
   return (
-    <a className="reflink" href={`#post_${postID}`} rel="ugc" onClick={onClick}>
+    <a
+      className={['reflink', ownPostIds?.includes(postID) ? 'reflink_own' : ''].join(' ')}
+      href={`#post_${postID}`}
+      rel="ugc"
+      onClick={onClick}
+    >
       &gt;&gt;{postID}
     </a>
   );
