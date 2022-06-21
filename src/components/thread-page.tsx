@@ -1,6 +1,8 @@
 import { useMatch } from '@tanstack/react-location';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Post } from '../domain';
+import { eventBus } from '../event-bus';
+import { SCROLL_BOTTOM } from '../events';
 import { updateFavicon, updateTitle } from '../favicon';
 import { OWN_POST_IDS_CHANGED, storage } from '../storage';
 import { LocationGenerics } from '../types';
@@ -43,6 +45,7 @@ export function ThreadPage() {
     }
 
     setPosts(posts);
+    setTimeout(() => eventBus.dispatch(SCROLL_BOTTOM), 100);
   }, [initialPosts]);
 
   const unreadPosts = useRef(0);

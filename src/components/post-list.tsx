@@ -4,7 +4,7 @@ import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
 import { Lightbox } from './lightbox';
 import { eventBus } from '../event-bus';
-import { POST_CREATED } from '../events';
+import { POST_CREATED, SCROLL_BOTTOM } from '../events';
 
 interface Rect {
   readonly width: number;
@@ -17,17 +17,18 @@ interface PostListProps {
   readonly ownPostIds?: number[];
 }
 
+const POST_TOP_PADDING = 4;
+const POST_BOTTOM_PADDING = 8;
 const POST_HEADER_HEIGHT = 24;
 const POST_HEADER_MARGIN = 4;
-const POST_FILE_MARGIN = 4;
 const BORDER_WIDTH = 2;
 const POST_MESSAGE_LINE_HEIGHT = 24;
 const POST_MARGIN = 16;
 
 function measurePost(post: PostModel): number {
-  let height = POST_HEADER_HEIGHT + POST_HEADER_MARGIN + POST_MARGIN;
+  let height = POST_TOP_PADDING + POST_HEADER_HEIGHT + POST_HEADER_MARGIN + POST_BOTTOM_PADDING + POST_MARGIN;
 
-  const filesHeight = post.files.length > 0 ? measureFiles(post.files) + 2 * BORDER_WIDTH + POST_FILE_MARGIN : 0;
+  const filesHeight = post.files.length > 0 ? measureFiles(post.files) : 0;
   const messageHeight = post.message.length > 0 ? measureMarkup(post.messageParsed) : 0;
   height += post.files.length === 1 ? Math.max(filesHeight, messageHeight) : filesHeight + messageHeight;
 
@@ -37,7 +38,11 @@ function measurePost(post: PostModel): number {
 function measureFiles(files: FileModel[]): number {
   let height = 0;
   for (const file of files) {
-    height = Math.max(height, file.thumbnailHeight);
+    height = Math.max(height, file.thumbnailHeight) + 2 * BORDER_WIDTH;
+  }
+
+  if (files.length > 4) {
+    height += 8 + files[4].thumbnailHeight + 2 * BORDER_WIDTH;
   }
 
   return height;
@@ -56,7 +61,7 @@ function estimateMarkupLines(markup: Markup[]): number {
         break;
 
       case 'text':
-        height += Math.floor((8 * node.text.length) / Math.min(800, window.innerWidth));
+        height += Math.floor((10 * node.text.length) / Math.min(800, window.innerWidth));
         break;
 
       case 'newline':
@@ -140,7 +145,8 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
       scrollToBottom();
     }
 
-    return eventBus.subscribe(POST_CREATED, handler);
+    const subscriptions = [eventBus.subscribe(POST_CREATED, handler), eventBus.subscribe(SCROLL_BOTTOM, handler)];
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, [scrollToBottom]);
 
   const [scrollTopVisible, setScrollTopVisible] = useState(false);

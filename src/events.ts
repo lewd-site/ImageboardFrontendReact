@@ -11,3 +11,6 @@ export const POST_CREATED = 'post_created';
 
 export const INSERT_QUOTE = 'insert_quote';
 export const INSERT_MARKUP = 'insert_markup';
+
+export const SCROLL_TOP = 'scroll_top';
+export const SCROLL_BOTTOM = 'scroll_bottom';
