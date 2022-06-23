@@ -20,3 +20,21 @@ export function formatUploadProgress(current: number, total: number, minUnitInde
   total = total / Math.pow(1024, unitIndex);
   return `${Number(current.toFixed(2))}/${Number(total.toFixed(2))} ${units[unitIndex]}байт`;
 }
+
+export function isAtBottom(padding: number = 200) {
+  const { scrollingElement } = document;
+  if (scrollingElement === null) {
+    return false;
+  }
+
+  return scrollingElement.scrollTop > scrollingElement.scrollHeight - scrollingElement.clientHeight - padding;
+}
+
+export function scrollToBottom() {
+  const { scrollingElement } = document;
+  if (scrollingElement === null) {
+    return;
+  }
+
+  scrollingElement.scrollTop = scrollingElement.scrollHeight;
+}

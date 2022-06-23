@@ -1,104 +1,57 @@
 import { useMatch } from '@tanstack/react-location';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Post } from '../domain';
-import { eventBus } from '../event-bus';
-import { SCROLL_BOTTOM } from '../events';
+import { useEffect, useMemo, useState } from 'react';
+import { Board, Post } from '../domain';
 import { updateFavicon, updateTitle } from '../favicon';
+import ThreadPageModel from '../model/thread-page';
 import { OWN_POST_IDS_CHANGED, storage } from '../storage';
 import { LocationGenerics } from '../types';
-import { SseThreadUpdater } from '../updater';
+import { isAtBottom, scrollToBottom } from '../utils';
+import { Layout } from './layout';
 import { PostList } from './post-list';
 import { PostingFormModal } from './posting-form-modal';
 
-function isAtBottom() {
-  const { scrollingElement } = document;
-  if (scrollingElement === null) {
-    return false;
-  }
-
-  return scrollingElement.scrollTop > scrollingElement.scrollHeight - scrollingElement.clientHeight - 200;
-}
-
-function scrollToBottom() {
-  const { scrollingElement } = document;
-  if (scrollingElement === null) {
-    return;
-  }
-
-  scrollingElement.scrollTop = scrollingElement.scrollHeight;
-}
+const SCROLL_TO_BOTTOM_DELAY = 100;
 
 export function ThreadPage() {
-  const [posts, setPosts] = useState<Map<number, Post>>(new Map());
-
-  const {
-    data: { posts: initialPosts },
-    params,
-  } = useMatch<LocationGenerics>();
-
-  useEffect(() => {
-    const posts = new Map();
-    if (typeof initialPosts !== 'undefined') {
-      for (const post of initialPosts) {
-        posts.set(post.id, post);
-      }
-    }
-
-    setPosts(posts);
-    setTimeout(() => eventBus.dispatch(SCROLL_BOTTOM), 100);
-  }, [initialPosts]);
-
-  const unreadPosts = useRef(0);
-  useEffect(() => {
-    function handler() {
-      if (!document.hidden) {
-        unreadPosts.current = 0;
-        updateTitle(unreadPosts.current);
-        updateFavicon(unreadPosts.current);
-      }
-    }
-
-    document.addEventListener('visibilitychange', handler);
-    return () => document.removeEventListener('visibilitychange', handler);
-  }, []);
-
+  const { params } = useMatch<LocationGenerics>();
   const { slug } = params;
   const parentId = Number(params.parentId.split('.').shift());
+
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   useEffect(() => {
-    const handler = (newPosts: Post[]) => {
-      setPosts((posts) => {
-        const result = new Map();
-        for (const post of posts.values()) {
-          result.set(post.id, post);
+    const model = new ThreadPageModel(slug, parentId);
+    const subscriptions = [
+      model.once(ThreadPageModel.POSTS_CHANGED, () => setTimeout(scrollToBottom, SCROLL_TO_BOTTOM_DELAY)),
+      model.subscribe<Board[]>(ThreadPageModel.BOARDS_CHANGED, setBoards),
+      model.subscribe<Post[]>(ThreadPageModel.POSTS_CHANGED, (posts) => {
+        setPosts(posts);
+
+        if (!document.hidden && isAtBottom()) {
+          setTimeout(scrollToBottom, SCROLL_TO_BOTTOM_DELAY);
         }
+      }),
+      model.subscribe<number>(ThreadPageModel.UNREAD_POSTS_COUNT_CHANGED, (unreadPostsCount) => {
+        updateTitle(unreadPostsCount);
+        updateFavicon(unreadPostsCount);
+      }),
+    ];
 
-        let newPostCount = 0;
-        for (const post of newPosts) {
-          if (!result.has(post.id)) {
-            newPostCount++;
-          }
+    model.load();
 
-          result.set(post.id, post);
-        }
+    function onVisibilityChanged() {
+      if (!document.hidden) {
+        model.resetUnreadCount();
+      }
+    }
 
-        if (document.hidden) {
-          unreadPosts.current += newPostCount;
-          updateTitle(unreadPosts.current);
-          updateFavicon(unreadPosts.current);
-        } else {
-          const atBottom = isAtBottom();
-          if (atBottom) {
-            setTimeout(() => scrollToBottom(), 100);
-          }
-        }
+    document.addEventListener('visibilitychange', onVisibilityChanged);
 
-        return result;
-      });
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChanged);
+      subscriptions.forEach((unsubscribe) => unsubscribe());
+      model.dispose();
     };
-
-    const updater = new SseThreadUpdater(slug, parentId);
-    updater.subscribe(handler);
-    return () => updater.dispose();
   }, [slug, parentId]);
 
   const [ownPostIds, setOwnPostIds] = useState<number[]>([]);
@@ -113,18 +66,21 @@ export function ThreadPage() {
   }, [parentId]);
 
   const postList = useMemo(
-    () => <PostList className="thread-page__posts" posts={[...posts.values()]} ownPostIds={ownPostIds} />,
+    () => <PostList className="thread-page__posts" posts={posts} ownPostIds={ownPostIds} />,
     [posts, ownPostIds]
   );
+
   const postingFormModal = useMemo(
     () => <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />,
     [slug, parentId]
   );
 
   return (
-    <div className="thread-page">
-      {postList}
-      {postingFormModal}
-    </div>
+    <Layout boards={boards}>
+      <div className="thread-page">
+        {postList}
+        {postingFormModal}
+      </div>
+    </Layout>
   );
 }

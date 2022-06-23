@@ -1,15 +1,30 @@
-import { Link, useMatch } from '@tanstack/react-location';
-import { useCallback } from 'react';
+import { Link } from '@tanstack/react-location';
+import { useCallback, useMemo } from 'react';
+import { Board } from '../domain';
 import { eventBus } from '../event-bus';
 import { HIDE_MENU } from '../events';
-import { LocationGenerics } from '../types';
 
-export function Sidebar() {
-  const {
-    data: { boards },
-  } = useMatch<LocationGenerics>();
+interface SidebarProps {
+  readonly boards: Board[];
+}
 
+export function Sidebar({ boards }: SidebarProps) {
   const hideSidebar = useCallback(() => eventBus.dispatch(HIDE_MENU), []);
+
+  const boardList = useMemo(() => {
+    if (!boards.length) {
+      return null;
+    }
+
+    return boards.map((board) => (
+      <li className="sidebar__item" key={board.slug}>
+        <Link className="sidebar__link" to={`/${board.slug}`} onClick={hideSidebar}>
+          <span className="icon icon_discussion"></span>
+          {board.title}
+        </Link>
+      </li>
+    ));
+  }, [boards]);
 
   return (
     <div className="sidebar">
@@ -26,14 +41,7 @@ export function Sidebar() {
             </Link>
           </li>
 
-          {boards?.map((board) => (
-            <li className="sidebar__item" key={board.slug}>
-              <Link className="sidebar__link" to={`/${board.slug}`} onClick={hideSidebar}>
-                <span className="icon icon_discussion"></span>
-                {board.title}
-              </Link>
-            </li>
-          ))}
+          {boardList}
         </ul>
       </nav>
     </div>

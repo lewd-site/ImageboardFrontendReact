@@ -1,5 +1,5 @@
-import { Outlet } from '@tanstack/react-location';
 import { useState, useEffect } from 'react';
+import { Board } from '../domain';
 import { eventBus } from '../event-bus';
 import { HIDE_MENU, HIDE_SETTINGS, SHOW_MENU, SHOW_SETTINGS } from '../events';
 import { Header } from './header';
@@ -18,7 +18,12 @@ const SETTINGS_CLASS = `${LAYOUT_CLASS}__settings`;
 const SETTINGS_VISIBLE_CLASS = `${SETTINGS_CLASS}_visible`;
 const SETTINGS_HIDDEN_CLASS = `${SETTINGS_CLASS}_hidden`;
 
-export function Layout() {
+interface LayoutProps {
+  readonly boards: Board[];
+  readonly children: any;
+}
+
+export function Layout({ boards, children }: LayoutProps) {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
 
@@ -56,12 +61,10 @@ export function Layout() {
       </header>
 
       <aside className={[SIDEBAR_CLASS, sidebarVisible ? SIDEBAR_VISIBLE_CLASS : SIDEBAR_HIDDEN_CLASS].join(' ')}>
-        <Sidebar />
+        <Sidebar boards={boards} />
       </aside>
 
-      <main className={CONTENT_CLASS}>
-        <Outlet />
-      </main>
+      <main className={CONTENT_CLASS}>{children}</main>
 
       <aside className={[SETTINGS_CLASS, settingsVisible ? SETTINGS_VISIBLE_CLASS : SETTINGS_HIDDEN_CLASS].join(' ')}>
         <Settings />

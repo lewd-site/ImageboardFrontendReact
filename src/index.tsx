@@ -1,11 +1,8 @@
 import { Outlet, ReactLocation, Route, Router } from '@tanstack/react-location';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { browseAllThreads, browseBoards, browsePosts } from './api';
 import { BoardPage } from './components/board-page';
 import { IndexPage } from './components/index-page';
-import { Layout } from './components/layout';
-import { Spinner } from './components/spinner';
 import { ThreadPage } from './components/thread-page';
 import { initFavicon } from './favicon';
 import settings, { Settings } from './settings';
@@ -65,55 +62,23 @@ function createApp() {
   const location = new ReactLocation<LocationGenerics>();
   const routes: Route<LocationGenerics>[] = [
     {
-      id: 'layout',
+      id: 'index',
       path: '/',
-      element: <Layout />,
-      loader: async () => ({ boards: await browseBoards() }),
-      loaderMaxAge: 0,
+      element: <IndexPage />,
+      meta: { name: 'index' },
+    },
+    {
+      path: ':slug',
       children: [
         {
-          id: 'index',
           path: '/',
-          element: <IndexPage />,
-          pendingElement: <Spinner />,
-          pendingMs: 100,
-          pendingMinMs: 100,
-          meta: {
-            name: 'index',
-          },
+          element: <BoardPage />,
+          meta: { name: 'board' },
         },
         {
-          path: ':slug',
-          loader: async ({ params: { slug } }) => ({
-            threads: await browseAllThreads(slug),
-          }),
-          loaderMaxAge: 0,
-          children: [
-            {
-              path: '/',
-              element: <BoardPage />,
-              pendingElement: <Spinner />,
-              pendingMs: 100,
-              pendingMinMs: 100,
-              meta: {
-                name: 'board',
-              },
-            },
-            {
-              path: 'res/:parentId',
-              element: <ThreadPage />,
-              loader: async ({ params: { slug, parentId } }) => ({
-                posts: await browsePosts(slug, Number(parentId.split('.').shift())),
-              }),
-              loaderMaxAge: 0,
-              pendingElement: <Spinner />,
-              pendingMs: 100,
-              pendingMinMs: 100,
-              meta: {
-                name: 'thread',
-              },
-            },
-          ],
+          path: 'res/:parentId',
+          element: <ThreadPage />,
+          meta: { name: 'thread' },
         },
       ],
     },

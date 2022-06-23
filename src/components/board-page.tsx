@@ -1,20 +1,32 @@
 import { useMatch, useNavigate } from '@tanstack/react-location';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Thread as ThreadModel, File as FileModel } from '../domain';
+import { Thread as ThreadModel, File as FileModel, Board } from '../domain';
 import { eventBus } from '../event-bus';
 import { THREAD_CREATED } from '../events';
+import BoardPageModel from '../model/board-page';
 import { LocationGenerics } from '../types';
+import { Layout } from './layout';
 import { Lightbox } from './lightbox';
 import { PostingFormModal } from './posting-form-modal';
 import { Thread } from './thread';
 
 export function BoardPage() {
-  const {
-    data: { threads },
-    params,
-  } = useMatch<LocationGenerics>();
-
+  const { params } = useMatch<LocationGenerics>();
   const { slug } = params;
+
+  const [boards, setBoards] = useState<Board[]>([]);
+  const [threads, setThreads] = useState<ThreadModel[]>([]);
+  useEffect(() => {
+    const model = new BoardPageModel(slug);
+    const subscriptions = [
+      model.subscribe<Board[]>(BoardPageModel.BOARDS_CHANGED, setBoards),
+      model.subscribe<ThreadModel[]>(BoardPageModel.THREADS_CHANGED, setThreads),
+    ];
+
+    model.load();
+
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
+  }, [slug]);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -90,10 +102,12 @@ export function BoardPage() {
   );
 
   return (
-    <div className="board-page">
-      {threadList}
-      {postingFormModal}
-      {lightbox}
-    </div>
+    <Layout boards={boards}>
+      <div className="board-page">
+        {threadList}
+        {postingFormModal}
+        {lightbox}
+      </div>
+    </Layout>
   );
 }
