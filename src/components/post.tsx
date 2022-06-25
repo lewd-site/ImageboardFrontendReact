@@ -5,6 +5,7 @@ import { File } from './file';
 import { eventBus } from '../event-bus';
 import { INSERT_QUOTE } from '../events';
 import { TimeAgo } from './time-ago';
+import { cls } from '../utils';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -56,13 +57,13 @@ export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailC
   const files = useMemo(
     () => (
       <div
-        className={[
+        className={cls([
           'post__files',
-          post.files.length === 1 ? 'post__files_single' : post.files.length > 1 ? 'post__files_multiple' : '',
-        ].join(' ')}
+          `post__files_${post.files.length > 1 ? 'multiple' : post.files.length === 1 ? 'single' : 'empty'}`,
+        ])}
       >
         {post.files.map((file, index) => (
-          <File file={file} key={index} onThumbnailClick={onThumbnailClick} />
+          <File className="post__file" file={file} key={index} onThumbnailClick={onThumbnailClick} />
         ))}
       </div>
     ),
@@ -70,7 +71,7 @@ export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailC
   );
 
   return (
-    <div id={`post_${post.id}`} className={['post', className].join(' ')}>
+    <div id={`post_${post.id}`} className={cls(['post', className])}>
       {header}
       {files}
       {message}

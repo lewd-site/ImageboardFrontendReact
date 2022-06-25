@@ -3,6 +3,7 @@ import { DraggableData, Position, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { eventBus } from '../event-bus';
 import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
+import { cls } from '../utils';
 import { PostingForm } from './posting-form';
 
 interface PostingFormModalProps {
@@ -112,10 +113,7 @@ export function PostingFormModal({ title, slug, parentId, showSubject }: Posting
       onEnter={onEnter}
       onExited={onExited}
     >
-      <div
-        className={['modal-overlay', modalVisible ? 'modal-overlay_visible' : 'modal-overlay_hidden'].join(' ')}
-        ref={nodeRef}
-      >
+      <div className={cls(['modal-overlay', `modal-overlay_${modalVisible ? 'visible' : 'hidden'}`])} ref={nodeRef}>
         <Rnd
           className="modal"
           bounds="parent"

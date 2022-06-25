@@ -5,6 +5,7 @@ import { File } from './file';
 import { Link } from '@tanstack/react-location';
 import { TimeAgo } from './time-ago';
 import { Post } from './post';
+import { cls } from '../utils';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -51,13 +52,13 @@ export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbn
   const files = useMemo(
     () => (
       <div
-        className={[
+        className={cls([
           'post__files',
-          thread.files.length === 1 ? 'post__files_single' : thread.files.length > 1 ? 'post__files_multiple' : '',
-        ].join(' ')}
+          `post__files_${thread.files.length > 1 ? 'multiple' : thread.files.length === 1 ? 'single' : 'empty'}`,
+        ])}
       >
         {thread.files.map((file, index) => (
-          <File file={file} key={index} onThumbnailClick={onThumbnailClick} />
+          <File className="post__file" file={file} key={index} onThumbnailClick={onThumbnailClick} />
         ))}
       </div>
     ),
@@ -74,7 +75,7 @@ export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbn
   );
 
   return (
-    <div id={`post_${thread.id}`} className={['post', className].join(' ')}>
+    <div id={`post_${thread.id}`} className={cls([className, 'post'])}>
       {header}
       {files}
       {markup}

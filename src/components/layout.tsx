@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Board } from '../domain';
 import { eventBus } from '../event-bus';
 import { HIDE_MENU, HIDE_SETTINGS, SHOW_MENU, SHOW_SETTINGS } from '../events';
+import { cls } from '../utils';
 import { Header } from './header';
 import { Settings } from './settings';
 import { Sidebar } from './sidebar';
@@ -60,13 +61,13 @@ export function Layout({ boards, children }: LayoutProps) {
         <Header />
       </header>
 
-      <aside className={[SIDEBAR_CLASS, sidebarVisible ? SIDEBAR_VISIBLE_CLASS : SIDEBAR_HIDDEN_CLASS].join(' ')}>
+      <aside className={cls([SIDEBAR_CLASS, sidebarVisible ? SIDEBAR_VISIBLE_CLASS : SIDEBAR_HIDDEN_CLASS])}>
         <Sidebar boards={boards} />
       </aside>
 
       <main className={CONTENT_CLASS}>{children}</main>
 
-      <aside className={[SETTINGS_CLASS, settingsVisible ? SETTINGS_VISIBLE_CLASS : SETTINGS_HIDDEN_CLASS].join(' ')}>
+      <aside className={cls([SETTINGS_CLASS, settingsVisible ? SETTINGS_VISIBLE_CLASS : SETTINGS_HIDDEN_CLASS])}>
         <Settings />
       </aside>
     </div>

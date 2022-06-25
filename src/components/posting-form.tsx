@@ -13,7 +13,7 @@ import { createPost, createThread } from '../api';
 import { eventBus } from '../event-bus';
 import { INSERT_MARKUP, INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { storage } from '../storage';
-import { formatFileSize, formatUploadProgress } from '../utils';
+import { cls, formatFileSize, formatUploadProgress } from '../utils';
 import { FileInput } from './file-input';
 
 interface PostingFormProps {
@@ -399,7 +399,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   }, [formRef.current]);
 
   return (
-    <form className={[className, 'posting-form'].join(' ')} onKeyDown={onKeyDown} onSubmit={onSubmit} ref={formRef}>
+    <form className={cls([className, 'posting-form'])} onKeyDown={onKeyDown} onSubmit={onSubmit} ref={formRef}>
       {showSubject && (
         <div className="posting-form__row">
           <input
@@ -514,10 +514,10 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       />
 
       <div
-        className={[
+        className={cls([
           'posting-form__drop-wrapper',
-          dropOverlayVisible ? 'posting-form__drop-wrapper_visible' : 'posting-form__drop-wrapper_hidden',
-        ].join(' ')}
+          `posting-form__drop-wrapper_${dropOverlayVisible ? 'visible' : 'hidden'}`,
+        ])}
       >
         <span className="icon icon_download"></span>
       </div>

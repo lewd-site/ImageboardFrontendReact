@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect } from 'react';
+import { cls } from '../utils';
 
 interface FileInputProps {
   readonly className?: string;
@@ -123,7 +124,7 @@ export function FileInput({ className, onChange, setAddFiles, setClear }: FileIn
   }, [setAddFiles, setClear]);
 
   return (
-    <div className={[className, 'file-input'].join(' ')}>
+    <div className={cls([className, 'file-input'])}>
       <div className="file-input__previews">{previews}</div>
 
       <label className="file-input__files">

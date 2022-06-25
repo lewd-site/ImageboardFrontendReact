@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-location';
 import { useCallback, MouseEvent } from 'react';
 import { Markup as MarkupModel } from '../domain';
+import { cls } from '../utils';
 
 export interface MarkupProps {
   readonly markup: MarkupModel[];
@@ -179,7 +180,7 @@ function Reflink({ postID, threadID, slug, ownPostIds, onReflinkClick }: Reflink
 
   return (
     <Link
-      className={['reflink', ownPostIds?.includes(postID) ? 'reflink_own' : ''].join(' ')}
+      className={cls(['reflink', ownPostIds?.includes(postID) && 'reflink_own'])}
       to={url}
       rel="ugc"
       onClick={onClick}

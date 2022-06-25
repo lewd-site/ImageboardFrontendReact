@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
-import { Post as PostModel, File as FileModel, Markup } from '../domain';
+import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
-import { Lightbox, useLightbox } from './lightbox';
-import { eventBus } from '../event-bus';
-import { POST_CREATED, SCROLL_BOTTOM } from '../events';
+import { cls } from '../utils';
 
 interface Rect {
   readonly width: number;
@@ -15,6 +13,7 @@ interface PostListProps {
   readonly className?: string;
   readonly posts: PostModel[];
   readonly ownPostIds?: number[];
+  readonly onThumbnailClick: (newFile: File) => void;
 }
 
 const POST_TOP_PADDING = 4;
@@ -73,7 +72,7 @@ function estimateMarkupLines(markup: Markup[]): number {
   return height;
 }
 
-export function PostList({ className, posts, ownPostIds }: PostListProps) {
+export function PostList({ className, posts, ownPostIds, onThumbnailClick }: PostListProps) {
   const postHeightCache = useRef(new Map<number, number>());
   const estimateSize = useCallback(
     (index: number) => {
@@ -132,54 +131,8 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
     [posts]
   );
 
-  const scrollToTop = useCallback(() => {
-    virtualizer.scrollToIndex(0, { align: 'end' });
-  }, []);
-
-  const scrollToBottom = useCallback(() => {
-    virtualizer.scrollToIndex(posts.length, { align: 'start' });
-  }, [posts]);
-
-  useEffect(() => {
-    function handler() {
-      scrollToBottom();
-    }
-
-    const subscriptions = [eventBus.subscribe(POST_CREATED, handler), eventBus.subscribe(SCROLL_BOTTOM, handler)];
-    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
-  }, [scrollToBottom]);
-
-  const [scrollTopVisible, setScrollTopVisible] = useState(false);
-  const [scrollBottomVisible, setScrollBottomVisible] = useState(true);
-
-  useEffect(() => {
-    function handler() {
-      const { scrollingElement } = document;
-      if (scrollingElement === null) {
-        return;
-      }
-
-      setScrollTopVisible(scrollingElement.scrollTop > 0.5 * scrollingElement.clientHeight);
-      setScrollBottomVisible(
-        scrollingElement.scrollTop < scrollingElement.scrollHeight - 1.5 * scrollingElement.clientHeight
-      );
-    }
-
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
-
-  const { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose } = useLightbox();
-
-  const lightbox = useMemo(
-    () => (
-      <Lightbox visible={lightboxVisible} file={file} setResetPosition={setResetPosition} onClose={onLightboxClose} />
-    ),
-    [lightboxVisible, file, setResetPosition, onLightboxClose]
-  );
-
   return (
-    <div className={[className, 'post-list'].join(' ')}>
+    <div className={cls([className, 'post-list'])}>
       <div className="post-list__inner" style={{ height: `${virtualizer.getTotalSize()}px` }}>
         {virtualizer.getVirtualItems().map((virtualRow) => (
           <div
@@ -189,12 +142,10 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
             key={posts[virtualRow.index].id}
           >
             <Post
-              className={[
+              className={cls([
                 'post-list__item',
-                typeof ownPostIds !== 'undefined' && ownPostIds.includes(posts[virtualRow.index].id)
-                  ? 'post-list__item_own'
-                  : '',
-              ].join(' ')}
+                ownPostIds?.includes(posts[virtualRow.index].id) && 'post-list__item_own',
+              ])}
               post={posts[virtualRow.index]}
               ownPostIds={ownPostIds}
               onReflinkClick={onReflinkClick}
@@ -203,30 +154,6 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
           </div>
         ))}
       </div>
-
-      <button
-        type="button"
-        className={[
-          'layout__scroll-top',
-          scrollTopVisible ? 'layout__scroll-top_visible' : 'layout__scroll-top_hidden',
-        ].join(' ')}
-        onClick={scrollToTop}
-      >
-        <span className="icon icon_up"></span>
-      </button>
-
-      <button
-        type="button"
-        className={[
-          'layout__scroll-bottom',
-          scrollBottomVisible ? 'layout__scroll-bottom_visible' : 'layout__scroll-bottom_hidden',
-        ].join(' ')}
-        onClick={scrollToBottom}
-      >
-        <span className="icon icon_down"></span>
-      </button>
-
-      {lightbox}
     </div>
   );
 }

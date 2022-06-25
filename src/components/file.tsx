@@ -1,8 +1,9 @@
 import { useCallback, MouseEvent, useMemo } from 'react';
 import { File as FileModel } from '../domain';
-import { formatFileSize } from '../utils';
+import { cls, formatFileSize } from '../utils';
 
 interface FileProps {
+  readonly className?: string;
   readonly file: FileModel;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
@@ -15,7 +16,7 @@ const AUDIO_THUMB_HEIGHT = 96;
 const MAX_THUMB_WIDTH = 200;
 const MAX_THUMB_HEIGHT = 200;
 
-export function File({ file, onThumbnailClick }: FileProps) {
+export function File({ className, file, onThumbnailClick }: FileProps) {
   const width = file.width || AUDIO_THUMB_WIDTH;
   const height = file.height || AUDIO_THUMB_HEIGHT;
 
@@ -34,6 +35,7 @@ export function File({ file, onThumbnailClick }: FileProps) {
     [onThumbnailClick]
   );
 
+  const fileType = file.type.split('/').shift();
   const fileInfo = useMemo(() => {
     let fileInfo = file.name;
     if (file.width !== null && file.height !== null) {
@@ -45,7 +47,7 @@ export function File({ file, onThumbnailClick }: FileProps) {
 
   return (
     <div
-      className={['post__file', 'file', `file_${file.type.split('/').shift()}`].join(' ')}
+      className={cls([className, 'file', `file_${fileType}`])}
       style={{ width: `${thumbnailWidth + 2 * BORDER_WIDTH}px`, height: `${thumbnailHeight + 2 * BORDER_WIDTH}px` }}
     >
       <a className="file__link" href={file.originalUrl} target="_blank" title={fileInfo} onClick={onClick}>

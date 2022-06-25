@@ -3,6 +3,7 @@ import { DraggableData, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { throttle } from 'throttle-debounce';
 import { File } from '../domain';
+import { cls } from '../utils';
 
 declare global {
   namespace JSX {
@@ -14,6 +15,7 @@ declare global {
 }
 
 interface LightboxProps {
+  readonly className?: string;
   readonly visible: boolean;
   readonly file: File | null;
   readonly setResetPosition?: (resetPosition: (file: File) => void) => void;
@@ -23,7 +25,7 @@ interface LightboxProps {
 const MAX_THUMB_WIDTH = 200;
 const MAX_THUMB_HEIGHT = 200;
 
-export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxProps) {
+export function Lightbox({ className, visible, file, setResetPosition, onClose }: LightboxProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   const [lightboxVisible, setLightboxVisible] = useState(true);
@@ -222,16 +224,13 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
     [file, size]
   );
 
-  const overlayClassName = [
-    'lightbox-overlay',
-    lightboxVisible ? 'lightbox-overlay_visible' : 'lightbox-overlay_hidden',
-  ].join(' ');
-
-  const lightboxClass = [
+  const overlayClassName = cls(['lightbox-overlay', `lightbox-overlay_${lightboxVisible ? 'visible' : 'hidden'}`]);
+  const lightboxClass = cls([
+    className,
     'lightbox',
-    transition ? 'lightbox_transition' : '',
-    file !== null ? `lightbox_${file.type.split('/').shift()}` : '',
-  ].join(' ');
+    transition && 'lightbox_transition',
+    file !== null && `lightbox_${file.type.split('/').shift()}`,
+  ]);
 
   let fileElement = null;
   if (file !== null) {

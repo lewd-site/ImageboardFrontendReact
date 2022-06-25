@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import cache from '../cache';
 import { Board } from '../domain';
 import IndexPageModel from '../model/index-page';
+import { cls } from '../utils';
 import { Layout } from './layout';
+import { ScrollButtons } from './scroll-buttons';
 
 function useIndexPageModel() {
   const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
@@ -27,7 +29,7 @@ export function IndexPage() {
     }
 
     return boards.map((board, index) => (
-      <tr className={['table__row', `table__row_${index % 2 === 0 ? 'even' : 'odd'}`].join(' ')} key={board.slug}>
+      <tr className={cls(['table__row', `table__row_${index % 2 === 0 ? 'even' : 'odd'}`])} key={board.slug}>
         <th className="table__cell table__cell_left" scope="row">
           <Link to={`/${board.slug}`}>/{board.slug}/</Link>
         </th>
@@ -56,6 +58,8 @@ export function IndexPage() {
             <tbody className="table__body">{boardList}</tbody>
           </table>
         </div>
+
+        <ScrollButtons />
       </div>
     </Layout>
   );

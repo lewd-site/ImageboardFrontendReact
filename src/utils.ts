@@ -30,6 +30,15 @@ export function isAtBottom(padding: number = 200) {
   return scrollingElement.scrollTop > scrollingElement.scrollHeight - scrollingElement.clientHeight - padding;
 }
 
+export function scrollToTop() {
+  const { scrollingElement } = document;
+  if (scrollingElement === null) {
+    return;
+  }
+
+  scrollingElement.scrollTop = 0;
+}
+
 export function scrollToBottom() {
   const { scrollingElement } = document;
   if (scrollingElement === null) {
@@ -37,4 +46,8 @@ export function scrollToBottom() {
   }
 
   scrollingElement.scrollTop = scrollingElement.scrollHeight;
+}
+
+export function cls(classNames: (string | false | null | undefined)[]) {
+  return classNames.filter((className) => typeof className === 'string' && className.length).join(' ');
 }

@@ -9,6 +9,7 @@ import { LocationGenerics } from '../types';
 import { Layout } from './layout';
 import { Lightbox, useLightbox } from './lightbox';
 import { PostingFormModal } from './posting-form-modal';
+import { ScrollButtons } from './scroll-buttons';
 import { Thread } from './thread';
 
 function useBoardPageModel(slug: string) {
@@ -81,6 +82,8 @@ export function BoardPage() {
         {threadList}
         {postingFormModal}
         {lightbox}
+
+        <ScrollButtons />
       </div>
     </Layout>
   );
