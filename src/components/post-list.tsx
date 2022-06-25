@@ -124,8 +124,15 @@ export function PostList({ className, posts, ownPostIds, onThumbnailClick }: Pos
   });
 
   const location = useLocation();
+  const previousHash = useRef(location.current.hash);
   useEffect(() => {
     const { hash } = location.current;
+    if (hash === previousHash.current) {
+      return;
+    }
+
+    previousHash.current = hash;
+
     const matches = hash.match(/post_(\d+)/);
     if (matches !== null) {
       const index = posts.findIndex((post) => post.id === Number(matches[1]));
