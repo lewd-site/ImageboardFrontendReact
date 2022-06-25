@@ -1,8 +1,9 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
 import { Post } from './post';
 import { cls } from '../utils';
+import { useLocation } from '@tanstack/react-location';
 
 interface Rect {
   readonly width: number;
@@ -16,6 +17,7 @@ interface PostListProps {
   readonly onThumbnailClick: (newFile: File) => void;
 }
 
+const SCROLL_DELAY = 100;
 const POST_TOP_PADDING = 4;
 const POST_BOTTOM_PADDING = 8;
 const POST_HEADER_HEIGHT = 24;
@@ -121,15 +123,17 @@ export function PostList({ className, posts, ownPostIds, onThumbnailClick }: Pos
     observeElementRect,
   });
 
-  const onReflinkClick = useCallback(
-    (id: number, parentId?: number, slug?: string) =>
-      // TODO: check if post is in the current thread
-      virtualizer.scrollToIndex(
-        posts.findIndex((post) => post.id === id),
-        { align: 'auto' }
-      ),
-    [posts]
-  );
+  const location = useLocation();
+  useEffect(() => {
+    const { hash } = location.current;
+    const matches = hash.match(/post_(\d+)/);
+    if (matches !== null) {
+      const index = posts.findIndex((post) => post.id === Number(matches[1]));
+      if (index !== -1) {
+        setTimeout(() => virtualizer.scrollToIndex(index, { align: 'auto' }), SCROLL_DELAY);
+      }
+    }
+  }, [location.current, virtualizer, posts]);
 
   return (
     <div className={cls([className, 'post-list'])}>
@@ -148,7 +152,6 @@ export function PostList({ className, posts, ownPostIds, onThumbnailClick }: Pos
               ])}
               post={posts[virtualRow.index]}
               ownPostIds={ownPostIds}
-              onReflinkClick={onReflinkClick}
               onThumbnailClick={onThumbnailClick}
             />
           </div>

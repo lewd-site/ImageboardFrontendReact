@@ -1,4 +1,4 @@
-import { useMatch } from '@tanstack/react-location';
+import { useMatch, useSearch } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
 import cache from '../cache';
 import { Board, Post } from '../domain';
@@ -15,7 +15,7 @@ import { PostList } from './post-list';
 import { PostingFormModal } from './posting-form-modal';
 import { ScrollButtons } from './scroll-buttons';
 
-const SCROLL_TO_BOTTOM_DELAY = 100;
+const SCROLL_DELAY = 100;
 
 function useThreadPageModel(slug: string, parentId: number) {
   const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
@@ -24,13 +24,25 @@ function useThreadPageModel(slug: string, parentId: number) {
   useEffect(() => {
     const model = new ThreadPageModel(slug, parentId);
     const subscriptions = [
-      model.once(ThreadPageModel.POSTS_CHANGED, () => setTimeout(scrollToBottom, SCROLL_TO_BOTTOM_DELAY)),
+      model.once(ThreadPageModel.POSTS_CHANGED, (posts: Post[]) => {
+        const { hash } = location;
+        const matches = hash.match(/post_(\d+)/);
+        if (matches === null) {
+          setTimeout(scrollToBottom, SCROLL_DELAY);
+          return;
+        }
+
+        const index = posts.findIndex((post) => post.id === Number(matches[1]));
+        if (index === -1) {
+          setTimeout(scrollToBottom, SCROLL_DELAY);
+        }
+      }),
       model.subscribe<Board[]>(ThreadPageModel.BOARDS_CHANGED, setBoards),
       model.subscribe<Post[]>(ThreadPageModel.POSTS_CHANGED, (posts) => {
         setPosts(posts);
 
         if (!document.hidden && isAtBottom()) {
-          setTimeout(scrollToBottom, SCROLL_TO_BOTTOM_DELAY);
+          setTimeout(scrollToBottom, SCROLL_DELAY);
         }
       }),
       model.subscribe<number>(ThreadPageModel.UNREAD_POSTS_COUNT_CHANGED, (unreadPostsCount) => {
@@ -67,14 +79,7 @@ export function ThreadPage() {
   const parentId = Number(params.parentId.split('.').shift());
   const { boards, posts, ownPostIds } = useThreadPageModel(slug, parentId);
 
-  useEffect(() => {
-    function handler() {
-      scrollToBottom();
-    }
-
-    const subscriptions = [eventBus.subscribe(POST_CREATED, handler)];
-    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
-  }, []);
+  useEffect(() => eventBus.subscribe(POST_CREATED, scrollToBottom), []);
 
   const { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose } = useLightbox();
 
@@ -108,6 +113,7 @@ export function ThreadPage() {
         {postList}
         {postingFormModal}
         {lightbox}
+
         <ScrollButtons />
       </div>
     </Layout>

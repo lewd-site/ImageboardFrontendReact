@@ -13,11 +13,10 @@ interface ThreadProps {
   readonly className?: string;
   readonly thread: ThreadModel;
   readonly ownPostIds?: number[];
-  readonly onReflinkClick?: (id: number, parentId?: number, slug?: string) => void;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
 
-export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbnailClick }: ThreadProps) {
+export function Thread({ className, thread, ownPostIds, onThumbnailClick }: ThreadProps) {
   const header = useMemo(() => {
     const name = !thread.name.length && !thread.tripcode.length ? DEFAULT_NAME : thread.name;
 
@@ -30,14 +29,7 @@ export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbn
           <span className="post__tripcode">{thread.tripcode}</span>
         </span>
 
-        <time
-          className="post__date"
-          dateTime={thread.createdAt.toISOString()}
-          title={thread.createdAt.toLocaleString()}
-        >
-          <TimeAgo value={thread.createdAt} />
-        </time>
-
+        <TimeAgo className="post__date" value={thread.createdAt} />
         <span className="post__id">{thread.id}</span>
 
         <span className="post__actions">
@@ -68,10 +60,10 @@ export function Thread({ className, thread, ownPostIds, onReflinkClick, onThumbn
   const markup = useMemo(
     () => (
       <div className="post__message">
-        <Markup markup={thread.messageParsed} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />
+        <Markup markup={thread.messageParsed} ownPostIds={ownPostIds} />
       </div>
     ),
-    [thread.messageParsed, ownPostIds, onReflinkClick]
+    [thread.messageParsed, ownPostIds]
   );
 
   return (

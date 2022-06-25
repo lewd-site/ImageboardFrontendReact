@@ -1,9 +1,9 @@
 import { useMatch, useNavigate } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
 import cache from '../cache';
-import { Thread as ThreadModel, Board } from '../domain';
+import { Thread as ThreadModel, Board, Post } from '../domain';
 import { eventBus } from '../event-bus';
-import { THREAD_CREATED } from '../events';
+import { INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import BoardPageModel from '../model/board-page';
 import { LocationGenerics } from '../types';
 import { Layout } from './layout';
@@ -36,15 +36,24 @@ export function BoardPage() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    function handler(thread?: ThreadModel) {
-      if (typeof thread === 'undefined') {
-        return;
-      }
+    const subscriptions = [
+      eventBus.subscribe(THREAD_CREATED, (thread: ThreadModel) => navigate({ to: `/${thread.slug}/res/${thread.id}` })),
+      eventBus.subscribe(POST_CREATED, (post: Post) =>
+        navigate({ to: `/${post.slug}/res/${post.parentId}#post_${post.id}` })
+      ),
+    ];
 
-      navigate({ to: `/${thread.slug}/res/${thread.id}` });
-    }
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
+  }, []);
 
-    return eventBus.subscribe(THREAD_CREATED, handler);
+  const [parentId, setParentId] = useState<number | null>(null);
+  useEffect(() => {
+    const subscriptions = [
+      eventBus.subscribe(SHOW_POST_FORM, () => setParentId(null)),
+      eventBus.subscribe(INSERT_QUOTE, (post: Post) => setParentId(post.parentId)),
+    ];
+
+    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, []);
 
   const { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose } = useLightbox();
@@ -64,10 +73,13 @@ export function BoardPage() {
     );
   }, [threads, onThumbnailClick]);
 
-  const postingFormModal = useMemo(
-    () => <PostingFormModal title="Создать тред" slug={slug} parentId={null} showSubject={true} />,
-    [slug]
-  );
+  const postingFormModal = useMemo(() => {
+    return parentId !== null ? (
+      <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />
+    ) : (
+      <PostingFormModal title="Создать тред" slug={slug} parentId={null} showSubject={true} />
+    );
+  }, [slug, parentId]);
 
   const lightbox = useMemo(
     () => (

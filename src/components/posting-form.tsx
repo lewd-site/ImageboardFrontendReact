@@ -10,6 +10,7 @@ import {
   ClipboardEvent,
 } from 'react';
 import { createPost, createThread } from '../api';
+import { Post } from '../domain';
 import { eventBus } from '../event-bus';
 import { INSERT_MARKUP, INSERT_QUOTE, POST_CREATED, SHOW_POST_FORM, THREAD_CREATED } from '../events';
 import { storage } from '../storage';
@@ -98,11 +99,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       }, FOCUS_DELAY);
     }
 
-    function insertQuote(postId?: number) {
-      if (typeof postId === 'undefined') {
-        return;
-      }
-
+    function insertQuote(post: Post) {
       const messageInput = messageRef.current;
       if (messageInput === null) {
         return;
@@ -118,7 +115,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
       const textAfter = messageInput.value.substring(selectionEnd);
 
       let cursor = selectionStart;
-      let textToInsert = `>>${postId}` + (quote.length ? `\n${quote}`.replace(/\n/g, '\n> ') : '');
+      let textToInsert = `>>${post.id}` + (quote.length ? `\n${quote}`.replace(/\n/g, '\n> ') : '');
 
       if (textBefore.length && !textBefore.endsWith('\n')) {
         textToInsert = `\n${textToInsert}`;
@@ -279,6 +276,7 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
   const insertSuperscript = useCallback(() => insertMarkup('[sup]', '[/sup]'), []);
   const insertSubscript = useCallback(() => insertMarkup('[sub]', '[/sub]'), []);
   const insertSpoiler = useCallback(() => insertMarkup('%%', '%%'), []);
+  const insertCode = useCallback(() => insertMarkup('[code]', '[/code]'), []);
 
   const onMessageKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -294,6 +292,8 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
           insertStrike();
         } else if (event.code === 'KeyP') {
           insertSpoiler();
+        } else if (event.code === 'KeyC') {
+          insertCode();
         }
       }
     },
@@ -441,70 +441,59 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         ref={messageRef}
       ></textarea>
 
-      <div className="posting-form__markup">
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_bold"
-          title="Полужирный, Alt+B"
-          onClick={insertBold}
-        >
-          Тт
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_italic"
-          title="Курсив. Alt+I"
-          onClick={insertItalic}
-        >
-          Тт
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_underline"
-          title="Подчёркнутый"
-          onClick={insertUnderline}
-        >
-          Тт
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_strike"
-          title="Зачёркнутый, Alt+T"
-          onClick={insertStrike}
-        >
-          Тт
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_superscript"
-          title="Надстрочный"
-          onClick={insertSuperscript}
-        >
-          <sup>Тт</sup>
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_subscript"
-          title="Подстрочный"
-          onClick={insertSubscript}
-        >
-          <sub>Тт</sub>
-        </button>
-
-        <button
-          type="button"
-          className="posting-form__markup-button posting-form__markup-button_spoiler"
-          title="Спойлер, Alt+P"
-          onClick={insertSpoiler}
-        >
-          Спойлер
-        </button>
-      </div>
+      <MarkupButtons
+        className="posting-form__markup"
+        buttons={[
+          {
+            key: 'bold',
+            title: 'Полужирный, Alt+B',
+            children: 'Тт',
+            onClick: insertBold,
+          },
+          {
+            key: 'italic',
+            title: 'Курсив. Alt+I',
+            children: 'Тт',
+            onClick: insertItalic,
+          },
+          {
+            key: 'underline',
+            title: 'Подчёркнутый',
+            children: 'Тт',
+            onClick: insertUnderline,
+          },
+          {
+            key: 'strike',
+            title: 'Зачёркнутый, Alt+T',
+            children: 'Тт',
+            onClick: insertStrike,
+          },
+          {
+            key: 'superscript',
+            title: 'Надстрочный',
+            children: <sup>Тт</sup>,
+            onClick: insertSuperscript,
+          },
+          {
+            key: 'subscript',
+            title: 'Подстрочный',
+            children: <sub>Тт</sub>,
+            onClick: insertSubscript,
+          },
+          {
+            key: 'spoiler',
+            title: 'Спойлер, Alt+P',
+            children: 'Спойлер',
+            onClick: insertSpoiler,
+          },
+          {
+            key: 'code',
+            title: 'Код, Alt+C',
+            children: 'Код',
+            onClick: insertCode,
+          },
+        ]}
+      />
 
       <FileInput
         className="posting-form__files-row"
@@ -542,5 +531,35 @@ export function PostingForm({ className, slug, parentId, showSubject }: PostingF
         </div>
       ) : null}
     </form>
+  );
+}
+
+interface MarkupButtonsProps {
+  readonly className?: string;
+  readonly buttons: MarkupButton[];
+}
+
+interface MarkupButton {
+  readonly key: string;
+  readonly title: string;
+  readonly children?: any;
+  readonly onClick?: () => void;
+}
+
+function MarkupButtons({ className, buttons }: MarkupButtonsProps) {
+  return (
+    <div className={className}>
+      {buttons.map((button) => (
+        <button
+          key={button.key}
+          type="button"
+          className={cls(['posting-form__markup-button', `posting-form__markup-button_${button.key}`])}
+          title={button.title}
+          onClick={button.onClick}
+        >
+          {button.children}
+        </button>
+      ))}
+    </div>
   );
 }

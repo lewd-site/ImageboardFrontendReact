@@ -109,6 +109,10 @@
       text-decoration: line-through;
     }
 
+    &_code {
+      font-family: 'Fira Code', monospace;
+    }
+
     &_superscript,
     &_subscript,
     &_spoiler,

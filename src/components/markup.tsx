@@ -6,10 +6,9 @@ import { cls } from '../utils';
 export interface MarkupProps {
   readonly markup: MarkupModel[];
   readonly ownPostIds?: number[];
-  readonly onReflinkClick?: (id: number, parentId?: number, slug?: string) => void;
 }
 
-export function Markup({ markup, ownPostIds, onReflinkClick }: MarkupProps) {
+export function Markup({ markup, ownPostIds }: MarkupProps) {
   return (
     <>
       {markup.map((node, index) => {
@@ -21,7 +20,7 @@ export function Markup({ markup, ownPostIds, onReflinkClick }: MarkupProps) {
             return node.text;
 
           case 'style':
-            const children = <Markup markup={node.children} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />;
+            const children = <Markup markup={node.children} ownPostIds={ownPostIds} />;
 
             switch (node.style) {
               case 'bold':
@@ -123,7 +122,6 @@ export function Markup({ markup, ownPostIds, onReflinkClick }: MarkupProps) {
                 threadID={node.threadID}
                 slug={node.slug}
                 ownPostIds={ownPostIds}
-                onReflinkClick={onReflinkClick}
               />
             );
 
@@ -155,35 +153,21 @@ export function Markup({ markup, ownPostIds, onReflinkClick }: MarkupProps) {
 }
 
 interface ReflinkProps {
-  readonly postID: number;
-  readonly threadID?: number;
   readonly slug?: string;
+  readonly threadID?: number;
+  readonly postID: number;
   readonly ownPostIds?: number[];
-  readonly onReflinkClick?: (id: number, parentId?: number, slug?: string) => void;
 }
 
-function Reflink({ postID, threadID, slug, ownPostIds, onReflinkClick }: ReflinkProps) {
-  const onClick = useCallback(
-    (event: MouseEvent) => {
-      if (typeof onReflinkClick !== 'undefined') {
-        event.preventDefault();
-        onReflinkClick(postID, threadID, slug);
-      }
-    },
-    [postID, onReflinkClick]
-  );
-
-  let url = `#post_${postID}`;
-  if (typeof threadID !== 'undefined' && typeof slug !== 'undefined') {
-    url = `/${slug}/res/${threadID}${url}`;
-  }
+function Reflink({ postID, threadID, slug, ownPostIds }: ReflinkProps) {
+  const url = typeof threadID !== 'undefined' && typeof slug !== 'undefined' ? `/${slug}/res/${threadID}` : '.';
 
   return (
     <Link
       className={cls(['reflink', ownPostIds?.includes(postID) && 'reflink_own'])}
       to={url}
+      hash={`post_${postID}`}
       rel="ugc"
-      onClick={onClick}
     >
       &gt;&gt;{postID}
     </Link>

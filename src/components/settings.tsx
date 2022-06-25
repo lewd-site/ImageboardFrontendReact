@@ -16,7 +16,7 @@ const THEMES = [
     id: 'yotsuba',
     name: 'Светлая',
   },
-];
+] as const;
 
 export function Settings() {
   const hideSettings = useCallback(() => eventBus.dispatch(HIDE_SETTINGS), []);
@@ -24,24 +24,24 @@ export function Settings() {
   const [nsfw, setNSFW] = useState(settings.nsfw);
   const [theme, setTheme] = useState(settings.theme);
 
-  useEffect(() => {
-    function handler(settings: SettingsModel) {
-      setNSFW(settings.nsfw);
-      setTheme(settings.theme);
-    }
+  useEffect(
+    () =>
+      settings.subscribe((settings: SettingsModel) => {
+        setNSFW(settings.nsfw);
+        setTheme(settings.theme);
+      }),
+    []
+  );
 
-    return settings.subscribe(handler);
-  }, []);
+  const onNSFWChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => setNSFW((settings.nsfw = event.target.checked)),
+    []
+  );
 
-  const onNSFWChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-    setNSFW(event.target.checked);
-    settings.nsfw = event.target.checked;
-  }, []);
-
-  const onThemeChange = useCallback((event: ChangeEvent<HTMLSelectElement>) => {
-    setTheme(event.target.value);
-    settings.theme = event.target.value;
-  }, []);
+  const onThemeChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => setTheme((settings.theme = event.target.value)),
+    []
+  );
 
   return (
     <div className="settings">

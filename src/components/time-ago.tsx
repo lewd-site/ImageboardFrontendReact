@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { cls } from '../utils';
 
 interface TimeAgoProps {
+  readonly className?: string;
   readonly value: Date;
 }
 
@@ -40,18 +42,26 @@ function formatPlural(value: number, forms: string[]) {
   return `${value} ${forms[[2, 0, 1, 1, 1][value % 5]]}`;
 }
 
-export function TimeAgo({ value }: TimeAgoProps) {
+export function TimeAgo({ className, value }: TimeAgoProps) {
   const { difference } = useSecondsSince(value);
-  const minutes = Math.floor(difference / SECONDS_IN_MINUTE);
-  if (minutes < 60) {
-    return <>{formatPlural(minutes, ['минуту', 'минуты', 'минут'])} назад</>;
-  }
+  const text = useMemo(() => {
+    const minutes = Math.floor(difference / SECONDS_IN_MINUTE);
+    if (minutes < 60) {
+      return formatPlural(minutes, ['минуту', 'минуты', 'минут']) + ' назад';
+    }
 
-  const hours = Math.floor(difference / SECONDS_IN_HOUR);
-  if (hours < 24) {
-    return <>{formatPlural(hours, ['час', 'часа', 'часов'])} назад</>;
-  }
+    const hours = Math.floor(difference / SECONDS_IN_HOUR);
+    if (hours < 24) {
+      return formatPlural(hours, ['час', 'часа', 'часов']) + ' назад';
+    }
 
-  const days = Math.floor(difference / SECONDS_IN_DAY);
-  return <>{formatPlural(days, ['день', 'дня', 'дней'])} назад</>;
+    const days = Math.floor(difference / SECONDS_IN_DAY);
+    return formatPlural(days, ['день', 'дня', 'дней']) + ' назад';
+  }, [difference]);
+
+  return (
+    <time className={cls([className])} dateTime={value.toISOString()} title={value.toLocaleString()}>
+      {text}
+    </time>
+  );
 }

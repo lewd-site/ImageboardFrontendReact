@@ -13,14 +13,11 @@ interface PostProps {
   readonly className?: string;
   readonly post: PostModel;
   readonly ownPostIds?: number[];
-  readonly onReflinkClick?: (id: number) => void;
   readonly onThumbnailClick?: (file: FileModel) => void;
 }
 
-export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailClick }: PostProps) {
-  const onReplyClick = useCallback(() => {
-    eventBus.dispatch(INSERT_QUOTE, post.id);
-  }, [post.id]);
+export function Post({ className, post, ownPostIds, onThumbnailClick }: PostProps) {
+  const onReplyClick = useCallback(() => eventBus.dispatch(INSERT_QUOTE, post), [post.id]);
 
   const header = useMemo(() => {
     const name = !post.name.length && !post.tripcode.length ? DEFAULT_NAME : post.name;
@@ -32,10 +29,7 @@ export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailC
           <span className="post__tripcode">{post.tripcode}</span>
         </span>
 
-        <time className="post__date" dateTime={post.createdAt.toISOString()} title={post.createdAt.toLocaleString()}>
-          <TimeAgo value={post.createdAt} />
-        </time>
-
+        <TimeAgo className="post__date" value={post.createdAt} />
         <span className="post__id">{post.id}</span>
 
         <button type="button" className="post__reply" onClick={onReplyClick}>
@@ -48,10 +42,10 @@ export function Post({ className, post, ownPostIds, onReflinkClick, onThumbnailC
   const message = useMemo(
     () => (
       <div className="post__message">
-        <Markup markup={post.messageParsed} ownPostIds={ownPostIds} onReflinkClick={onReflinkClick} />
+        <Markup markup={post.messageParsed} ownPostIds={ownPostIds} />
       </div>
     ),
-    [post.messageParsed, ownPostIds, onReflinkClick]
+    [post.messageParsed, ownPostIds]
   );
 
   const files = useMemo(
