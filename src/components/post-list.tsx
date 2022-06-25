@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
-import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
+import { Post as PostModel, File as FileModel, Markup } from '../domain';
 import { Post } from './post';
-import { Lightbox } from './lightbox';
+import { Lightbox, useLightbox } from './lightbox';
 import { eventBus } from '../event-bus';
 import { POST_CREATED, SCROLL_BOTTOM } from '../events';
 
@@ -169,38 +169,7 @@ export function PostList({ className, posts, ownPostIds }: PostListProps) {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  const [lightboxVisible, setLightboxVisible] = useState<boolean>(false);
-  const [file, setFile] = useState<FileModel | null>(null);
-
-  const resetPosition = useRef((file: FileModel) => {});
-  const setResetPosition = useCallback((value: (file: FileModel) => void) => (resetPosition.current = value), []);
-
-  const onThumbnailClick = useCallback(
-    (newFile: FileModel) => {
-      setFile((file) => {
-        if (file?.hash === newFile?.hash) {
-          if (lightboxVisible) {
-            setLightboxVisible(false);
-            return file;
-          } else {
-            resetPosition.current(file);
-          }
-        }
-
-        return file?.originalUrl === newFile.originalUrl ? file : null;
-      });
-
-      if (!lightboxVisible || file?.hash !== newFile?.hash) {
-        setTimeout(() => {
-          setLightboxVisible(true);
-          setFile(newFile);
-        });
-      }
-    },
-    [file, lightboxVisible]
-  );
-
-  const onLightboxClose = useCallback(() => setLightboxVisible(false), []);
+  const { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose } = useLightbox();
 
   const lightbox = useMemo(
     () => (

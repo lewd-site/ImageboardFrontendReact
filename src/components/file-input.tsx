@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect, ReactNode } from 'react';
+import { useRef, useState, useCallback, ChangeEvent, useMemo, useEffect } from 'react';
 
 interface FileInputProps {
   readonly className?: string;

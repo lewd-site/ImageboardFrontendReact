@@ -9,6 +9,21 @@ const SECONDS_IN_MINUTE = 60;
 const SECONDS_IN_HOUR = 60 * 60;
 const SECONDS_IN_DAY = 60 * 60 * 24;
 
+function useSecondsSince(value: Date) {
+  const timestamp = useMemo(() => {
+    return value.getTime() / MS_IN_SECOND;
+  }, [value]);
+
+  const [now, setNow] = useState(Date.now() / MS_IN_SECOND);
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now() / MS_IN_SECOND), 5 * MS_IN_SECOND);
+    return () => clearInterval(id);
+  }, [timestamp]);
+
+  const difference = Math.max(0, now - timestamp);
+  return { difference };
+}
+
 function formatPlural(value: number, forms: string[]) {
   if (value === 0) {
     return `меньше ${forms[1]}`;
@@ -26,21 +41,7 @@ function formatPlural(value: number, forms: string[]) {
 }
 
 export function TimeAgo({ value }: TimeAgoProps) {
-  const timestamp = useMemo(() => {
-    return value.getTime() / MS_IN_SECOND;
-  }, [value]);
-
-  const [now, setNow] = useState(Date.now() / MS_IN_SECOND);
-  useEffect(() => {
-    function handler() {
-      setNow(Date.now() / MS_IN_SECOND);
-    }
-
-    const id = setInterval(handler, 5 * MS_IN_SECOND);
-    return () => clearInterval(id);
-  }, [timestamp]);
-
-  const difference = Math.max(0, now - timestamp);
+  const { difference } = useSecondsSince(value);
   const minutes = Math.floor(difference / SECONDS_IN_MINUTE);
   if (minutes < 60) {
     return <>{formatPlural(minutes, ['минуту', 'минуты', 'минут'])} назад</>;

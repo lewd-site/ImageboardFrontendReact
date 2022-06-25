@@ -1,5 +1,6 @@
 import { useMatch } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
+import cache from '../cache';
 import { Board, Post } from '../domain';
 import { updateFavicon, updateTitle } from '../favicon';
 import ThreadPageModel from '../model/thread-page';
@@ -12,13 +13,10 @@ import { PostingFormModal } from './posting-form-modal';
 
 const SCROLL_TO_BOTTOM_DELAY = 100;
 
-export function ThreadPage() {
-  const { params } = useMatch<LocationGenerics>();
-  const { slug } = params;
-  const parentId = Number(params.parentId.split('.').shift());
-
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [posts, setPosts] = useState<Post[]>([]);
+function useThreadPageModel(slug: string, parentId: number) {
+  const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
+  const [posts, setPosts] = useState<Post[]>([...cache.getPosts(slug, parentId).values()]);
+  const [ownPostIds, setOwnPostIds] = useState<number[]>([]);
   useEffect(() => {
     const model = new ThreadPageModel(slug, parentId);
     const subscriptions = [
@@ -35,9 +33,11 @@ export function ThreadPage() {
         updateTitle(unreadPostsCount);
         updateFavicon(unreadPostsCount);
       }),
+      storage.subscribe(OWN_POST_IDS_CHANGED, () => storage.getOwnPostIds(parentId).then(setOwnPostIds)),
     ];
 
     model.load();
+    storage.getOwnPostIds(parentId).then(setOwnPostIds);
 
     function onVisibilityChanged() {
       if (!document.hidden) {
@@ -54,16 +54,14 @@ export function ThreadPage() {
     };
   }, [slug, parentId]);
 
-  const [ownPostIds, setOwnPostIds] = useState<number[]>([]);
-  useEffect(() => {
-    async function onOwnPostIdsChanged() {
-      setOwnPostIds(await storage.getOwnPostIds(parentId));
-    }
+  return { boards, posts, ownPostIds };
+}
 
-    onOwnPostIdsChanged();
-
-    return storage.subscribe(OWN_POST_IDS_CHANGED, onOwnPostIdsChanged);
-  }, [parentId]);
+export function ThreadPage() {
+  const { params } = useMatch<LocationGenerics>();
+  const { slug } = params;
+  const parentId = Number(params.parentId.split('.').shift());
+  const { boards, posts, ownPostIds } = useThreadPageModel(slug, parentId);
 
   const postList = useMemo(
     () => <PostList className="thread-page__posts" posts={posts} ownPostIds={ownPostIds} />,

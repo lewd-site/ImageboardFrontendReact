@@ -1,4 +1,4 @@
-import { DragEvent, MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DraggableData, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { throttle } from 'throttle-debounce';
@@ -299,4 +299,41 @@ export function Lightbox({ visible, file, setResetPosition, onClose }: LightboxP
       </div>
     </CSSTransition>
   );
+}
+
+export function useLightbox() {
+  const [lightboxVisible, setLightboxVisible] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  const resetPosition = useRef((file: File) => {});
+  const setResetPosition = useCallback((value: (file: File) => void) => (resetPosition.current = value), []);
+
+  const onThumbnailClick = useCallback(
+    (newFile: File) => {
+      setFile((file) => {
+        if (file?.hash === newFile?.hash) {
+          if (lightboxVisible) {
+            setLightboxVisible(false);
+            return file;
+          } else {
+            resetPosition.current(file);
+          }
+        }
+
+        return file?.originalUrl === newFile.originalUrl ? file : null;
+      });
+
+      if (!lightboxVisible || file?.hash !== newFile?.hash) {
+        setTimeout(() => {
+          setLightboxVisible(true);
+          setFile(newFile);
+        });
+      }
+    },
+    [file, lightboxVisible]
+  );
+
+  const onLightboxClose = useCallback(() => setLightboxVisible(false), []);
+
+  return { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose };
 }

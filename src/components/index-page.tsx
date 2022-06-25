@@ -1,19 +1,25 @@
 import { Link } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
+import cache from '../cache';
 import { Board } from '../domain';
 import IndexPageModel from '../model/index-page';
 import { Layout } from './layout';
 
-export function IndexPage() {
-  const [boards, setBoards] = useState<Board[]>([]);
+function useIndexPageModel() {
+  const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
   useEffect(() => {
     const model = new IndexPageModel();
     const subscriptions = [model.subscribe<Board[]>(IndexPageModel.BOARDS_CHANGED, setBoards)];
-
     model.load();
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   }, []);
+
+  return { boards };
+}
+
+export function IndexPage() {
+  const { boards } = useIndexPageModel();
 
   const boardList = useMemo(() => {
     if (typeof boards === 'undefined') {

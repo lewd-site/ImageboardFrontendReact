@@ -1,4 +1,5 @@
 import { browseBoards, browsePosts } from '../api';
+import cache from '../cache';
 import { Board, Post } from '../domain';
 import EventEmitter from '../event-emitter';
 import { SseThreadUpdater, ThreadUpdater } from '../updater';
@@ -8,8 +9,8 @@ export class ThreadPageModel extends EventEmitter {
   public static readonly POSTS_CHANGED = 'POSTS_CHANGED';
   public static readonly UNREAD_POSTS_COUNT_CHANGED = 'UNREAD_POSTS_COUNT_CHANGED';
 
-  protected readonly boards: Map<string, Board> = new Map();
-  protected readonly posts: Map<number, Post> = new Map();
+  protected readonly boards: Map<string, Board>;
+  protected readonly posts: Map<number, Post>;
 
   protected readonly updater: ThreadUpdater;
 
@@ -17,6 +18,9 @@ export class ThreadPageModel extends EventEmitter {
 
   public constructor(public readonly slug: string, public readonly parentId: number) {
     super();
+
+    this.boards = cache.getBoards();
+    this.posts = cache.getPosts(slug, parentId);
 
     this.updater = new SseThreadUpdater(this.slug, this.parentId);
     this.updater.subscribe(this.onThreadUpdated);
@@ -34,6 +38,7 @@ export class ThreadPageModel extends EventEmitter {
           this.boards.set(board.slug, board);
         }
 
+        cache.setBoards(this.boards);
         this.dispatch(ThreadPageModel.BOARDS_CHANGED, [...this.boards.values()]);
       }),
       browsePosts(this.slug, this.parentId).then((posts) => {
@@ -42,6 +47,7 @@ export class ThreadPageModel extends EventEmitter {
           this.posts.set(post.id, post);
         }
 
+        cache.setPosts(this.slug, this.parentId, this.posts);
         this.dispatch(ThreadPageModel.POSTS_CHANGED, [...this.posts.values()]);
       }),
     ]);
@@ -57,6 +63,7 @@ export class ThreadPageModel extends EventEmitter {
       this.posts.set(post.id, post);
     }
 
+    cache.setPosts(this.slug, this.parentId, this.posts);
     this.dispatch(ThreadPageModel.POSTS_CHANGED, [...this.posts.values()]);
 
     if (newPostCount > 0 && document.hidden) {
