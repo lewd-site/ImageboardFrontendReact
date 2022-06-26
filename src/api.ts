@@ -311,6 +311,16 @@ export async function browseAllThreads(slug: string): Promise<Thread[]> {
   return result;
 }
 
+export async function readThread(slug: string, id: number): Promise<Thread> {
+  const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads/${id}`);
+  const { item } = await response.json();
+  if (!isThreadDto(item)) {
+    throw new ApiError(`Invalid thread DTO: ${JSON.stringify(item)}`);
+  }
+
+  return convertThreadDtoToThread(item);
+}
+
 export async function browsePosts(slug: string, parentId: number): Promise<Post[]> {
   const response = await fetch(`${config.api.baseUrl}/boards/${slug}/threads/${parentId}/posts`);
   const { items } = await response.json();

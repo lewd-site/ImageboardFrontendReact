@@ -1,7 +1,7 @@
-import { useMatch, useSearch } from '@tanstack/react-location';
+import { useMatch } from '@tanstack/react-location';
 import { useEffect, useMemo, useState } from 'react';
 import cache from '../cache';
-import { Board, Post } from '../domain';
+import { Board, Post, Thread as ThreadModel } from '../domain';
 import { eventBus } from '../event-bus';
 import { POST_CREATED } from '../events';
 import { updateFavicon, updateTitle } from '../favicon';
@@ -14,11 +14,13 @@ import { Lightbox, useLightbox } from './lightbox';
 import { PostList } from './post-list';
 import { PostingFormModal } from './posting-form-modal';
 import { ScrollButtons } from './scroll-buttons';
+import { Thread } from './thread';
 
 const SCROLL_DELAY = 100;
 
 function useThreadPageModel(slug: string, parentId: number) {
   const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
+  const [thread, setThread] = useState<ThreadModel | null>(cache.getThread(slug, parentId));
   const [posts, setPosts] = useState<Post[]>([...cache.getPosts(slug, parentId).values()]);
   const [ownPostIds, setOwnPostIds] = useState<number[]>([]);
   useEffect(() => {
@@ -38,6 +40,7 @@ function useThreadPageModel(slug: string, parentId: number) {
         }
       }),
       model.subscribe<Board[]>(ThreadPageModel.BOARDS_CHANGED, setBoards),
+      model.subscribe<ThreadModel>(ThreadPageModel.THREAD_CHANGED, setThread),
       model.subscribe<Post[]>(ThreadPageModel.POSTS_CHANGED, (posts) => {
         setPosts(posts);
 
@@ -70,14 +73,14 @@ function useThreadPageModel(slug: string, parentId: number) {
     };
   }, [slug, parentId]);
 
-  return { boards, posts, ownPostIds };
+  return { boards, thread, posts, ownPostIds };
 }
 
 export function ThreadPage() {
   const { params } = useMatch<LocationGenerics>();
   const { slug } = params;
   const parentId = Number(params.parentId.split('.').shift());
-  const { boards, posts, ownPostIds } = useThreadPageModel(slug, parentId);
+  const { boards, thread, posts, ownPostIds } = useThreadPageModel(slug, parentId);
 
   useEffect(() => eventBus.subscribe(POST_CREATED, scrollToBottom), []);
 
@@ -87,7 +90,7 @@ export function ThreadPage() {
     () => (
       <PostList
         className="thread-page__posts"
-        posts={posts}
+        posts={posts.slice(1)}
         ownPostIds={ownPostIds}
         onThumbnailClick={onThumbnailClick}
       />
@@ -110,6 +113,14 @@ export function ThreadPage() {
   return (
     <Layout boards={boards}>
       <div className="thread-page">
+        {thread && (
+          <Thread
+            className="thread-page__thread"
+            thread={thread}
+            ownPostIds={ownPostIds}
+            onThumbnailClick={onThumbnailClick}
+          />
+        )}
         {postList}
         {postingFormModal}
         {lightbox}

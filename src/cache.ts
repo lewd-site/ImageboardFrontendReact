@@ -13,6 +13,25 @@ export class Cache {
     this.boards = new Map(boards);
   }
 
+  public getThread(slug: string, id: number): Thread | null {
+    const threads = this.threadsPerBoard.get(slug);
+    if (typeof threads === 'undefined') {
+      return null;
+    }
+
+    return threads.get(id) || null;
+  }
+
+  public setThread(slug: string, thread: Thread) {
+    let threads = this.threadsPerBoard.get(slug);
+    if (typeof threads === 'undefined') {
+      threads = new Map();
+    }
+
+    threads.set(thread.id, thread);
+    this.threadsPerBoard.set(slug, new Map(threads));
+  }
+
   public getThreads(slug: string): Map<number, Thread> {
     const threads = this.threadsPerBoard.get(slug);
     if (typeof threads === 'undefined') {

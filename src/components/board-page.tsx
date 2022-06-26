@@ -10,7 +10,7 @@ import { Layout } from './layout';
 import { Lightbox, useLightbox } from './lightbox';
 import { PostingFormModal } from './posting-form-modal';
 import { ScrollButtons } from './scroll-buttons';
-import { Thread } from './thread';
+import { ThreadPreview } from './thread-preview';
 
 function useBoardPageModel(slug: string) {
   const [boards, setBoards] = useState<Board[]>([...cache.getBoards().values()]);
@@ -67,7 +67,12 @@ export function BoardPage() {
       <div className="board-page__threads thread-list">
         <h2 className="board-page__title">Список тредов</h2>
         {threads.map((thread) => (
-          <Thread key={thread.id} className="thread-list__item" thread={thread} onThumbnailClick={onThumbnailClick} />
+          <ThreadPreview
+            key={thread.id}
+            className="thread-list__item"
+            thread={thread}
+            onThumbnailClick={onThumbnailClick}
+          />
         ))}
       </div>
     );
