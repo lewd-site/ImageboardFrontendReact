@@ -89,6 +89,8 @@ export interface Thread {
   readonly files: File[];
   readonly message: string;
   readonly messageParsed: Markup[];
+  readonly referencedBy: PostReference[];
+  readonly references: PostReference[];
   readonly createdAt: Date;
   readonly bumpedAt: Date;
   readonly postCount: number;
@@ -104,5 +106,14 @@ export interface Post {
   readonly files: File[];
   readonly message: string;
   readonly messageParsed: Markup[];
+  readonly referencedBy: PostReference[];
+  readonly references: PostReference[];
   readonly createdAt: Date;
+}
+
+export interface PostReference {
+  readonly sourceId: number;
+  readonly sourceParentId: number | null;
+  readonly targetId: number;
+  readonly targetParentId: number | null;
 }

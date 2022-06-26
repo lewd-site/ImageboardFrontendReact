@@ -60,6 +60,18 @@ export class ThreadPageModel extends EventEmitter {
         newPostCount++;
       }
 
+      for (const ref of post.references) {
+        const target = this.posts.get(ref.targetId);
+        if (typeof target !== 'undefined' && target.referencedBy.findIndex((r) => r.sourceId === ref.sourceId) === -1) {
+          target.referencedBy.push({
+            targetId: target.id,
+            targetParentId: target.parentId,
+            sourceId: post.id,
+            sourceParentId: post.parentId,
+          });
+        }
+      }
+
       this.posts.set(post.id, post);
     }
 

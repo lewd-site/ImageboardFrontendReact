@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-location';
 import { useCallback, MouseEvent } from 'react';
 import { Markup as MarkupModel } from '../domain';
 import { cls } from '../utils';
+import { Reflink } from './reflink';
 
 export interface MarkupProps {
   readonly markup: MarkupModel[];
@@ -118,8 +119,8 @@ export function Markup({ markup, ownPostIds }: MarkupProps) {
             return (
               <Reflink
                 key={index}
-                postID={node.postID}
-                threadID={node.threadID}
+                postId={node.postID}
+                threadId={node.threadID}
                 slug={node.slug}
                 ownPostIds={ownPostIds}
               />
@@ -149,27 +150,5 @@ export function Markup({ markup, ownPostIds }: MarkupProps) {
         }
       })}
     </>
-  );
-}
-
-interface ReflinkProps {
-  readonly slug?: string;
-  readonly threadID?: number;
-  readonly postID: number;
-  readonly ownPostIds?: number[];
-}
-
-function Reflink({ postID, threadID, slug, ownPostIds }: ReflinkProps) {
-  const url = typeof threadID !== 'undefined' && typeof slug !== 'undefined' ? `/${slug}/res/${threadID}` : '.';
-
-  return (
-    <Link
-      className={cls(['reflink', ownPostIds?.includes(postID) && 'reflink_own'])}
-      to={url}
-      hash={`post_${postID}`}
-      rel="ugc"
-    >
-      &gt;&gt;{postID}
-    </Link>
   );
 }

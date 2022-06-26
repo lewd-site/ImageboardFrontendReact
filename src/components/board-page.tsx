@@ -50,7 +50,7 @@ export function BoardPage() {
   useEffect(() => {
     const subscriptions = [
       eventBus.subscribe(SHOW_POST_FORM, () => setParentId(null)),
-      eventBus.subscribe(INSERT_QUOTE, (post: Post) => setParentId(post.parentId)),
+      eventBus.subscribe(INSERT_QUOTE, (post: Post) => setParentId(post.parentId || post.id)),
     ];
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());

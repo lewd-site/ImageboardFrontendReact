@@ -6,6 +6,8 @@ import { eventBus } from '../event-bus';
 import { INSERT_QUOTE } from '../events';
 import { TimeAgo } from './time-ago';
 import { cls } from '../utils';
+import { Link } from '@tanstack/react-location';
+import { Reflink } from './reflink';
 
 const DEFAULT_NAME = 'Anonymous';
 
@@ -39,7 +41,7 @@ export function Post({ className, post, ownPostIds, onThumbnailClick }: PostProp
     );
   }, [post.name, post.tripcode, post.createdAt, post.id]);
 
-  const message = useMemo(
+  const markup = useMemo(
     () => (
       <div className="post__message">
         <Markup markup={post.messageParsed} ownPostIds={ownPostIds} />
@@ -68,7 +70,25 @@ export function Post({ className, post, ownPostIds, onThumbnailClick }: PostProp
     <div id={`post_${post.id}`} className={cls(['post', className])}>
       {header}
       {files}
-      {message}
+
+      <div className="post__content">
+        {markup}
+        {post.referencedBy.length > 0 && (
+          <div className="post__refs">
+            Ответы:
+            {post.referencedBy.map((ref) => (
+              <Reflink
+                className="post__ref"
+                key={ref.sourceId}
+                slug={post.slug}
+                threadId={ref.sourceParentId || undefined}
+                postId={ref.sourceId}
+                ownPostIds={ownPostIds}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

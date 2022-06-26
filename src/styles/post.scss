@@ -61,6 +61,7 @@
     width: 22px;
     height: 22px;
 
+    margin-right: 8px;
     padding: 0;
 
     &:hover {
@@ -94,9 +95,7 @@
     overflow: hidden;
   }
 
-  &__message {
-    word-wrap: break-word;
-
+  &__content {
     &::after {
       content: '';
       display: table;
@@ -106,6 +105,30 @@
     &:not(:last-child) {
       margin-bottom: 8px;
     }
+  }
+
+  &__message {
+    word-wrap: break-word;
+
+    &:not(:last-child) {
+      margin-bottom: 4px;
+    }
+  }
+
+  &__refs {
+    display: flex;
+    flex-flow: row wrap;
+
+    font-size: 0.75em;
+    font-style: italic;
+
+    &:not(:last-child) {
+      margin-bottom: 4px;
+    }
+  }
+
+  &__ref {
+    margin-left: 4px;
   }
 
   &__omitted-replies {

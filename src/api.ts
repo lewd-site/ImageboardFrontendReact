@@ -32,6 +32,8 @@ export interface ThreadDto {
   readonly files: FileDto[];
   readonly message: string;
   readonly message_parsed: Markup[];
+  readonly referenced_by: PostReferenceDto[];
+  readonly references: PostReferenceDto[];
   readonly created_at: string;
   readonly bumped_at: string;
   readonly post_count: number;
@@ -48,7 +50,16 @@ export interface PostDto {
   readonly files: FileDto[];
   readonly message: string;
   readonly message_parsed: Markup[];
+  readonly referenced_by: PostReferenceDto[];
+  readonly references: PostReferenceDto[];
   readonly created_at: string;
+}
+
+export interface PostReferenceDto {
+  readonly source_id: number;
+  readonly source_parent_id: number | null;
+  readonly target_id: number;
+  readonly target_parent_id: number | null;
 }
 
 interface RequestOptions {
@@ -208,6 +219,18 @@ export function convertThreadDtoToThread(thread: ThreadDto): Thread {
     files: thread.files.map(convertFileDtoToFile),
     message: thread.message,
     messageParsed: thread.message_parsed,
+    referencedBy: thread.referenced_by.map((ref) => ({
+      sourceId: ref.source_id,
+      sourceParentId: ref.source_parent_id,
+      targetId: ref.target_id,
+      targetParentId: ref.target_parent_id,
+    })),
+    references: thread.references.map((ref) => ({
+      sourceId: ref.source_id,
+      sourceParentId: ref.source_parent_id,
+      targetId: ref.target_id,
+      targetParentId: ref.target_parent_id,
+    })),
     createdAt: new Date(thread.created_at),
     bumpedAt: new Date(thread.bumped_at),
     postCount: thread.post_count,
@@ -225,6 +248,18 @@ export function convertPostDtoToPost(post: PostDto): Post {
     files: post.files.map(convertFileDtoToFile),
     message: post.message,
     messageParsed: post.message_parsed,
+    referencedBy: post.referenced_by.map((ref) => ({
+      sourceId: ref.source_id,
+      sourceParentId: ref.source_parent_id,
+      targetId: ref.target_id,
+      targetParentId: ref.target_parent_id,
+    })),
+    references: post.references.map((ref) => ({
+      sourceId: ref.source_id,
+      sourceParentId: ref.source_parent_id,
+      targetId: ref.target_id,
+      targetParentId: ref.target_parent_id,
+    })),
     createdAt: new Date(post.created_at),
   };
 }
