@@ -1,16 +1,17 @@
 import { useMemo } from 'react';
-import { File, Thread as ThreadModel } from '../domain';
+import { Embed, File, Thread as ThreadModel } from '../domain';
 import { Markup } from './markup';
 import { cls } from '../utils';
 import { PostHeader } from './post-header';
 import { PostFiles } from './post-files';
 import { PostReferences } from './post-references';
+import { PostEmbeds } from './post-embeds';
 
 interface ThreadProps {
   readonly className?: string;
   readonly thread: ThreadModel;
   readonly ownPostIds?: number[];
-  readonly onThumbnailClick?: (file: File) => void;
+  readonly onThumbnailClick?: (media: File | Embed) => void;
 }
 
 export function Thread({ className, thread, ownPostIds, onThumbnailClick }: ThreadProps) {
@@ -32,6 +33,7 @@ export function Thread({ className, thread, ownPostIds, onThumbnailClick }: Thre
 
       <div className="post__content">
         {markup}
+        <PostEmbeds post={thread} onThumbnailClick={onThumbnailClick} />
         <PostReferences post={thread} ownPostIds={ownPostIds} />
       </div>
     </div>

@@ -1,16 +1,17 @@
 import { useMemo } from 'react';
-import { Post as PostModel, File } from '../domain';
+import { Post as PostModel, File, Embed as EmbedModel } from '../domain';
 import { Markup } from './markup';
 import { cls } from '../utils';
 import { PostHeader } from './post-header';
 import { PostFiles } from './post-files';
 import { PostReferences } from './post-references';
+import { PostEmbeds } from './post-embeds';
 
 interface PostProps {
   readonly className?: string;
   readonly post: PostModel;
   readonly ownPostIds?: number[];
-  readonly onThumbnailClick?: (file: File) => void;
+  readonly onThumbnailClick?: (media: File | EmbedModel) => void;
 }
 
 export function Post({ className, post, ownPostIds, onThumbnailClick }: PostProps) {
@@ -30,6 +31,7 @@ export function Post({ className, post, ownPostIds, onThumbnailClick }: PostProp
 
       <div className="post__content">
         {markup}
+        <PostEmbeds post={post} onThumbnailClick={onThumbnailClick} />
         <PostReferences post={post} ownPostIds={ownPostIds} />
       </div>
     </div>

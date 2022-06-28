@@ -34,6 +34,7 @@ interface StyleNode {
 
 interface LinkNode {
   readonly type: 'link';
+  readonly icon?: string;
   readonly url: string;
   readonly text: string;
 }
@@ -80,6 +81,22 @@ export interface File {
   get fallbackThumbnailUrl(): string;
 }
 
+export interface Embed {
+  readonly type: string;
+  readonly name: string;
+  readonly url: string;
+  readonly width: number;
+  readonly height: number;
+  readonly thumbnailUrl: string;
+  readonly thumbnailWidth: number;
+  readonly thumbnailHeight: number;
+  readonly createdAt: Date;
+}
+
+export function isFile(media: File | Embed | null): media is File {
+  return media !== null && 'hash' in media;
+}
+
 export interface Thread {
   readonly slug: string;
   readonly id: number;
@@ -87,6 +104,7 @@ export interface Thread {
   readonly name: string;
   readonly tripcode: string;
   readonly files: File[];
+  readonly embeds: Embed[];
   readonly message: string;
   readonly messageParsed: Markup[];
   readonly referencedBy: PostReference[];
@@ -104,6 +122,7 @@ export interface Post {
   readonly name: string;
   readonly tripcode: string;
   readonly files: File[];
+  readonly embeds: Embed[];
   readonly message: string;
   readonly messageParsed: Markup[];
   readonly referencedBy: PostReference[];

@@ -42,6 +42,14 @@ a,
   text-decoration: underline;
 }
 
+.link {
+  .icon {
+    position: relative;
+    top: 2.5px;
+    margin-right: 2px;
+  }
+}
+
 .reflink {
   &_own::after {
     content: ' (You)';

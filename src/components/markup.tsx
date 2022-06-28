@@ -111,6 +111,7 @@ export function Markup({ markup, ownPostIds }: MarkupProps) {
 
             return (
               <a className="link" href={node.url} target={target} rel="ugc" key={index}>
+                {node.icon && <span className={cls(['icon', `icon_${node.icon}`])}></span>}
                 {node.text}
               </a>
             );

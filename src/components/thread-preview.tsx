@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Thread, File } from '../domain';
+import { Thread, File, Embed } from '../domain';
 import { Markup } from './markup';
 import { Link } from '@tanstack/react-location';
 import { Post } from './post';
@@ -7,12 +7,13 @@ import { cls } from '../utils';
 import { PostHeader } from './post-header';
 import { PostFiles } from './post-files';
 import { PostReferences } from './post-references';
+import { PostEmbeds } from './post-embeds';
 
 interface ThreadPreviewProps {
   readonly className?: string;
   readonly thread: Thread;
   readonly ownPostIds?: number[];
-  readonly onThumbnailClick?: (file: File) => void;
+  readonly onThumbnailClick?: (media: File | Embed) => void;
 }
 
 export function ThreadPreview({ className, thread, ownPostIds, onThumbnailClick }: ThreadPreviewProps) {
@@ -43,6 +44,7 @@ export function ThreadPreview({ className, thread, ownPostIds, onThumbnailClick 
 
       <div className="post__content">
         {markup}
+        <PostEmbeds post={thread} onThumbnailClick={onThumbnailClick} />
         <PostReferences post={thread} ownPostIds={ownPostIds} />
         {omittedReplies > 0 && <div className="post__omitted-replies">Пропущено постов: {omittedReplies}</div>}
       </div>
@@ -55,7 +57,7 @@ export function ThreadPreview({ className, thread, ownPostIds, onThumbnailClick 
 interface ThreadRepliesProps {
   readonly thread: Thread;
   readonly ownPostIds?: number[];
-  readonly onThumbnailClick?: (file: File) => void;
+  readonly onThumbnailClick?: (media: File | Embed) => void;
 }
 
 function ThreadReplies({ thread, ownPostIds, onThumbnailClick }: ThreadRepliesProps) {

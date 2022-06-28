@@ -32,7 +32,7 @@ export function File({ className, file, onThumbnailClick }: FileProps) {
         onThumbnailClick(file);
       }
     },
-    [onThumbnailClick]
+    [file, onThumbnailClick]
   );
 
   const fileType = file.type.split('/').shift();

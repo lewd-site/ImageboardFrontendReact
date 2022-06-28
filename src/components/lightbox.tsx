@@ -2,7 +2,7 @@ import { DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { DraggableData, Rnd } from 'react-rnd';
 import { CSSTransition } from 'react-transition-group';
 import { throttle } from 'throttle-debounce';
-import { File } from '../domain';
+import { Embed, File, isFile } from '../domain';
 import { cls } from '../utils';
 
 declare global {
@@ -17,8 +17,8 @@ declare global {
 interface LightboxProps {
   readonly className?: string;
   readonly visible: boolean;
-  readonly file: File | null;
-  readonly setResetPosition?: (resetPosition: (file: File) => void) => void;
+  readonly file: File | Embed | null;
+  readonly setResetPosition?: (resetPosition: (media: File | Embed) => void) => void;
   readonly onClose?: () => void;
 }
 
@@ -62,7 +62,7 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [size, setSize] = useState({ width: 0, height: 0 });
 
-  const resetPosition = useCallback((file: File) => {
+  const resetPosition = useCallback((file: File | Embed) => {
     const fileWidth = file.width || MAX_THUMB_WIDTH;
     const fileHeight = file.height || MAX_THUMB_HEIGHT;
 
@@ -234,39 +234,54 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
 
   let fileElement = null;
   if (file !== null) {
-    if (file.type.startsWith('image/')) {
-      fileElement = (
-        <picture className="lightbox__picture" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-          <img className="lightbox__image" src={file.originalUrl} alt="" />
-        </picture>
-      );
-    } else if (file.type.startsWith('audio/')) {
-      fileElement = (
-        <div className="lightbox__audio-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-          <picture className="lightbox__picture">
-            <source srcSet={file.fallbackThumbnailUrl} type={file.fallbackThumbnailType} />
-            <img className="lightbox__image" src={file.thumbnailUrl} alt="" />
+    if (isFile(file)) {
+      if (file.type.startsWith('image/')) {
+        fileElement = (
+          <picture className="lightbox__picture" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+            <img className="lightbox__image" src={file.originalUrl} alt="" />
           </picture>
-          {lightboxVisible && (
-            <audio-player
-              class="lightbox__audio"
-              ref={audioPlayerRef}
+        );
+      } else if (file.type.startsWith('audio/')) {
+        fileElement = (
+          <div className="lightbox__audio-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+            <picture className="lightbox__picture">
+              <source srcSet={file.fallbackThumbnailUrl} type={file.fallbackThumbnailType} />
+              <img className="lightbox__image" src={file.thumbnailUrl} alt="" />
+            </picture>
+            {lightboxVisible && (
+              <audio-player
+                class="lightbox__audio"
+                ref={audioPlayerRef}
+                autoplay={true}
+                loop={true}
+                src={file.originalUrl}
+                width={size.width}
+              ></audio-player>
+            )}
+          </div>
+        );
+      } else if (file.type.startsWith('video/')) {
+        fileElement = lightboxVisible && (
+          <div className="lightbox__video-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+            <video-player
+              class="lightbox__video"
               autoplay={true}
               loop={true}
               src={file.originalUrl}
               width={size.width}
-            ></audio-player>
-          )}
-        </div>
-      );
-    } else if (file.type.startsWith('video/')) {
+              height={size.height}
+            ></video-player>
+          </div>
+        );
+      }
+    } else if (file.type === 'video/x-youtube') {
       fileElement = lightboxVisible && (
         <div className="lightbox__video-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
           <video-player
             class="lightbox__video"
             autoplay={true}
             loop={true}
-            src={file.originalUrl}
+            src={file.url}
             width={size.width}
             height={size.height}
           ></video-player>
@@ -302,27 +317,30 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
 
 export function useLightbox() {
   const [lightboxVisible, setLightboxVisible] = useState<boolean>(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | Embed | null>(null);
 
-  const resetPosition = useRef((file: File) => {});
-  const setResetPosition = useCallback((value: (file: File) => void) => (resetPosition.current = value), []);
+  const resetPosition = useRef((file: File | Embed) => {});
+  const setResetPosition = useCallback((value: (file: File | Embed) => void) => (resetPosition.current = value), []);
 
   const onThumbnailClick = useCallback(
-    (newFile: File) => {
-      setFile((file) => {
-        if (file?.hash === newFile?.hash) {
-          if (lightboxVisible) {
-            setLightboxVisible(false);
-            return file;
-          } else {
-            resetPosition.current(file);
-          }
+    (newFile: File | Embed) => {
+      const fileChanged =
+        isFile(file) !== isFile(newFile) ||
+        (isFile(file) && isFile(newFile) && file?.hash !== newFile?.hash) ||
+        (!isFile(file) && !isFile(newFile) && file?.url !== newFile?.url);
+
+      if (fileChanged) {
+        setFile(null);
+      } else {
+        if (lightboxVisible) {
+          setLightboxVisible(false);
+          setFile(file);
+        } else if (file !== null) {
+          resetPosition.current(file);
         }
+      }
 
-        return file?.originalUrl === newFile.originalUrl ? file : null;
-      });
-
-      if (!lightboxVisible || file?.hash !== newFile?.hash) {
+      if (!lightboxVisible || fileChanged) {
         setTimeout(() => {
           setLightboxVisible(true);
           setFile(newFile);

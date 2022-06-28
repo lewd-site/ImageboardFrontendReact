@@ -1,5 +1,5 @@
 import config from './config';
-import { Board, Markup, Thread, Post, File as FileModel } from './domain';
+import { Board, Markup, Thread, Post, File as FileModel, Embed } from './domain';
 
 export class ApiError extends Error {}
 
@@ -23,6 +23,18 @@ export interface FileDto {
   readonly created_at: string;
 }
 
+export interface EmbedDto {
+  readonly type: string;
+  readonly name: string;
+  readonly url: string;
+  readonly width: number;
+  readonly height: number;
+  readonly thumbnail_url: string;
+  readonly thumbnail_width: number;
+  readonly thumbnail_height: number;
+  readonly created_at: string;
+}
+
 export interface ThreadDto {
   readonly slug: string;
   readonly id: number;
@@ -30,6 +42,7 @@ export interface ThreadDto {
   readonly name: string | null;
   readonly tripcode: string | null;
   readonly files: FileDto[];
+  readonly embeds: EmbedDto[];
   readonly message: string;
   readonly message_parsed: Markup[];
   readonly referenced_by: PostReferenceDto[];
@@ -48,6 +61,7 @@ export interface PostDto {
   readonly name: string | null;
   readonly tripcode: string | null;
   readonly files: FileDto[];
+  readonly embeds: EmbedDto[];
   readonly message: string;
   readonly message_parsed: Markup[];
   readonly referenced_by: PostReferenceDto[];
@@ -93,6 +107,20 @@ export function isFileDto(file: any): file is FileDto {
     (('height' in file && file.height === null) || typeof file.height === 'number') &&
     (('length' in file && file.length === null) || typeof file.length === 'number') &&
     typeof file.created_at === 'string'
+  );
+}
+
+export function isEmbedDto(embed: any): embed is EmbedDto {
+  return (
+    typeof embed.type === 'string' &&
+    typeof embed.name === 'string' &&
+    typeof embed.url === 'string' &&
+    typeof embed.width === 'number' &&
+    typeof embed.height === 'number' &&
+    typeof embed.thumbnail_url === 'string' &&
+    typeof embed.thumbnail_width === 'number' &&
+    typeof embed.thumbnail_height === 'number' &&
+    typeof embed.created_at === 'string'
   );
 }
 
@@ -209,6 +237,20 @@ export function convertFileDtoToFile(file: FileDto): FileModel {
   };
 }
 
+export function convertEmbedDtoToEmbed(embed: EmbedDto): Embed {
+  return {
+    type: embed.type,
+    name: embed.name,
+    url: embed.url,
+    width: +embed.thumbnail_width,
+    height: +embed.thumbnail_height,
+    thumbnailUrl: embed.thumbnail_url,
+    thumbnailWidth: +embed.width,
+    thumbnailHeight: +embed.height,
+    createdAt: new Date(embed.created_at),
+  };
+}
+
 export function convertThreadDtoToThread(thread: ThreadDto): Thread {
   return {
     slug: thread.slug,
@@ -217,6 +259,7 @@ export function convertThreadDtoToThread(thread: ThreadDto): Thread {
     name: thread.name !== null ? thread.name : '',
     tripcode: thread.tripcode !== null ? thread.tripcode : '',
     files: thread.files.map(convertFileDtoToFile),
+    embeds: thread.embeds.map(convertEmbedDtoToEmbed),
     message: thread.message,
     messageParsed: thread.message_parsed,
     referencedBy: thread.referenced_by.map((ref) => ({
@@ -246,6 +289,7 @@ export function convertPostDtoToPost(post: PostDto): Post {
     name: post.name !== null ? post.name : '',
     tripcode: post.tripcode !== null ? post.tripcode : '',
     files: post.files.map(convertFileDtoToFile),
+    embeds: post.embeds.map(convertEmbedDtoToEmbed),
     message: post.message,
     messageParsed: post.message_parsed,
     referencedBy: post.referenced_by.map((ref) => ({

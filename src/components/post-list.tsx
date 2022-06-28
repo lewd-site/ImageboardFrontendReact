@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useWindowVirtualizer, Virtualizer } from '@tanstack/react-virtual';
-import { Post as PostModel, File as FileModel, Markup, File } from '../domain';
+import { Post as PostModel, File as FileModel, Markup, File, Embed } from '../domain';
 import { Post } from './post';
 import { cls } from '../utils';
 import { useLocation } from '@tanstack/react-location';
@@ -14,7 +14,7 @@ interface PostListProps {
   readonly className?: string;
   readonly posts: PostModel[];
   readonly ownPostIds?: number[];
-  readonly onThumbnailClick: (newFile: File) => void;
+  readonly onThumbnailClick: (media: File | Embed) => void;
 }
 
 const SCROLL_DELAY = 100;
