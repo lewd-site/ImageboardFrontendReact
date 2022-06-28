@@ -241,10 +241,10 @@ export function convertEmbedDtoToEmbed(embed: EmbedDto): Embed {
   return {
     type: embed.type,
     name: embed.name,
-    url: embed.url,
+    url: embed.url.replace(/^https\:/i, window.location.protocol),
     width: +embed.thumbnail_width,
     height: +embed.thumbnail_height,
-    thumbnailUrl: embed.thumbnail_url,
+    thumbnailUrl: embed.thumbnail_url.replace(/^https\:/i, window.location.protocol),
     thumbnailWidth: +embed.width,
     thumbnailHeight: +embed.height,
     createdAt: new Date(embed.created_at),
