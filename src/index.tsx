@@ -7,7 +7,6 @@ import { ThreadPage } from './components/thread-page';
 import { initFavicon } from './favicon';
 import settings, { Settings } from './settings';
 import { LocationGenerics } from './types';
-import '@lewd-site/components';
 
 initFavicon();
 

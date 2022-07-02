@@ -1,0 +1,39 @@
+.seek-bar {
+  height: 16px;
+
+  cursor: pointer;
+
+  &__inner {
+    position: relative;
+    top: 50%;
+
+    background: var(--background);
+    border-radius: 2px;
+
+    height: 4px;
+    transition: height 100ms ease;
+
+    transform: translate(0, -50%);
+
+    overflow: hidden;
+  }
+
+  &:hover &__inner {
+    height: 8px;
+  }
+
+  &__fill {
+    position: relative;
+    top: 0;
+    left: 0;
+
+    background: var(--primary);
+    border-radius: 2px;
+
+    width: 0;
+    height: 100%;
+
+    pointer-events: none;
+    user-select: none;
+  }
+}

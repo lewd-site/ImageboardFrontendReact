@@ -4,15 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import { throttle } from 'throttle-debounce';
 import { Embed, File, isFile } from '../domain';
 import { cls } from '../utils';
-
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'audio-player': any;
-      'video-player': any;
-    }
-  }
-}
+import { Player } from './player/player';
 
 interface LightboxProps {
   readonly className?: string;
@@ -43,17 +35,6 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
 
     elementRef.current.addEventListener('wheel', handle);
     return () => elementRef.current?.removeEventListener('wheel', handle);
-  });
-
-  const audioPlayerRef = useRef<any>(null);
-  useEffect(() => {
-    function handle(event: Event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
-    audioPlayerRef.current?.addEventListener('pointerdown', handle);
-    return () => audioPlayerRef.current?.removeEventListener('pointerdown', handle);
   });
 
   const onEnter = useCallback(() => setLightboxVisible(true), []);
@@ -128,7 +109,6 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
 
       if (
         typeof onClose !== 'undefined' &&
-        (file?.type.startsWith('image/') || file?.type.startsWith('audio/')) &&
         Math.abs(dragStartPosition.current.x - data.x) < 1 &&
         Math.abs(dragStartPosition.current.y - data.y) < 1
       ) {
@@ -241,50 +221,17 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
             <img className="lightbox__image" src={file.originalUrl} alt="" />
           </picture>
         );
-      } else if (file.type.startsWith('audio/')) {
+      } else if (file.type.startsWith('audio/') || file.type.startsWith('video/')) {
         fileElement = (
-          <div className="lightbox__audio-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-            <picture className="lightbox__picture">
-              <source srcSet={file.fallbackThumbnailUrl} type={file.fallbackThumbnailType} />
-              <img className="lightbox__image" src={file.thumbnailUrl} alt="" />
-            </picture>
-            {lightboxVisible && (
-              <audio-player
-                class="lightbox__audio"
-                ref={audioPlayerRef}
-                autoplay={true}
-                loop={true}
-                src={file.originalUrl}
-                width={size.width}
-              ></audio-player>
-            )}
-          </div>
-        );
-      } else if (file.type.startsWith('video/')) {
-        fileElement = lightboxVisible && (
-          <div className="lightbox__video-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-            <video-player
-              class="lightbox__video"
-              autoplay={true}
-              loop={true}
-              src={file.originalUrl}
-              width={size.width}
-              height={size.height}
-            ></video-player>
+          <div className="lightbox__video" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+            {lightboxVisible && <Player type={file.type} url={file.originalUrl} />}
           </div>
         );
       }
     } else if (file.type === 'video/x-youtube') {
-      fileElement = lightboxVisible && (
-        <div className="lightbox__video-wrapper" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
-          <video-player
-            class="lightbox__video"
-            autoplay={true}
-            loop={true}
-            src={file.url}
-            width={size.width}
-            height={size.height}
-          ></video-player>
+      fileElement = (
+        <div className="lightbox__video" ref={elementRef} onDragStart={onDragStart} onWheel={onWheel}>
+          {lightboxVisible && <Player type={file.type} url={file.url} />}
         </div>
       );
     }
@@ -303,7 +250,7 @@ export function Lightbox({ className, visible, file, setResetPosition, onClose }
         <Rnd
           className={lightboxClass}
           position={position}
-          size={size}
+          size={{ width: Math.floor(size.width), height: Math.floor(size.height) }}
           enableResizing={false}
           onDragStart={onRndDragStart}
           onDragStop={onRndDragStop}

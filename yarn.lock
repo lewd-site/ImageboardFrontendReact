@@ -100,16 +100,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lewd-site/components@https://github.com/lewd-site/Components":
-  version: 1.1.1
-  resolution: "@lewd-site/components@https://github.com/lewd-site/Components.git#commit=8fe07ef189a935a9e8564c8d7c13ba1b6645fa68"
-  dependencies:
-    lit: ^2.2.0
-    normalize.css: ^8.0.1
-  checksum: a6f064c9a74691708b1d355a97e6dfe73e47ffb178e5a976f6d9308a734527a78055fce1b0ac3203aee033a00f186dbec5f7847e4a832d2d4f6867dce3e4864c
-  languageName: node
-  linkType: hard
-
 "@lezer/common@npm:^0.15.0, @lezer/common@npm:^0.15.7":
   version: 0.15.12
   resolution: "@lezer/common@npm:0.15.12"
@@ -123,13 +113,6 @@ __metadata:
   dependencies:
     "@lezer/common": ^0.15.0
   checksum: e741225d6ac9cf08f8016bad49622fbd4a4e0d20c2e8c2b38a0abf0ddca69c58275b0ebdb9d5dde2905cf84f6977bc302f7ed5e5ba42c23afa27e9e65b900f36
-  languageName: node
-  linkType: hard
-
-"@lit/reactive-element@npm:^1.3.0":
-  version: 1.3.2
-  resolution: "@lit/reactive-element@npm:1.3.2"
-  checksum: 0a89906ddebe2fe2772d942769fc6d69c53e445d476f449690daf371e196b73b99422b7722d262b97d8233e91528ee66b821d013032f0f9fd0f3fd178b4f6a45
   languageName: node
   linkType: hard
 
@@ -1140,13 +1123,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/trusted-types@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@types/trusted-types@npm:2.0.2"
-  checksum: 3371eef5f1c50e1c3c07a127c1207b262ba65b83dd167a1c460fc1b135a3fb0c97b9f508efebd383f239cc5dd5b7169093686a692a501fde9c3f7208657d9b0d
-  languageName: node
-  linkType: hard
-
 "abbrev@npm:1":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -2152,7 +2128,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "imageboard-frontend-react@workspace:."
   dependencies:
-    "@lewd-site/components": "https://github.com/lewd-site/Components"
     "@parcel/core": ^2.6.0
     "@parcel/transformer-sass": ^2.5.0
     "@tanstack/react-location": ^3.7.4
@@ -2355,36 +2330,6 @@ __metadata:
   version: 1.2.4
   resolution: "lines-and-columns@npm:1.2.4"
   checksum: 0c37f9f7fa212b38912b7145e1cd16a5f3cd34d782441c3e6ca653485d326f58b3caccda66efce1c5812bde4961bbde3374fae4b0d11bf1226152337f3894aa5
-  languageName: node
-  linkType: hard
-
-"lit-element@npm:^3.2.0":
-  version: 3.2.0
-  resolution: "lit-element@npm:3.2.0"
-  dependencies:
-    "@lit/reactive-element": ^1.3.0
-    lit-html: ^2.2.0
-  checksum: 64bd0f05f7a93921a5853e92f4b86b75affc088805f5ce0249c62a02a1d44445dea5c8319badc4cae6e5663afeb60296e3e0f63fd3af265b89fa482c8a846c3d
-  languageName: node
-  linkType: hard
-
-"lit-html@npm:^2.2.0":
-  version: 2.2.6
-  resolution: "lit-html@npm:2.2.6"
-  dependencies:
-    "@types/trusted-types": ^2.0.2
-  checksum: be0dacad92f21d1b3702616beecd73cf2dc0f73fed0c5985841a374615d2a185c62960438555620a0cfd089d99bfa2c350d8054b8d8790b2b3173c8dc93993bc
-  languageName: node
-  linkType: hard
-
-"lit@npm:^2.2.0":
-  version: 2.2.6
-  resolution: "lit@npm:2.2.6"
-  dependencies:
-    "@lit/reactive-element": ^1.3.0
-    lit-element: ^3.2.0
-    lit-html: ^2.2.0
-  checksum: 4a899cb669d8a7f97e8d3152ef73dede8dae5807a2cbdaeb89f912ca8c4dd5393fee03e06903d2aa8222843822e03c665617227ee2770dcd0c348e036128eb58
   languageName: node
   linkType: hard
 

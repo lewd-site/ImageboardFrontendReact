@@ -1,7 +1,14 @@
 export type Listener<T> = (data: T) => void;
 export type Unsubscribe = () => void;
 
-export class EventEmitter {
+export interface IEventEmitter {
+  subscribe<T>(event: string, listener: Listener<T>): Unsubscribe;
+  once<T>(event: string, listener: Listener<T>): Unsubscribe;
+  dispatch<T>(event: string, data?: T): void;
+  dispose(): void;
+}
+
+export class EventEmitter implements IEventEmitter {
   protected _listeners: { [event: string]: Listener<any>[] } = {};
 
   public subscribe<T>(event: string, listener: Listener<T>): Unsubscribe {
@@ -35,6 +42,13 @@ export class EventEmitter {
 
     for (const listener of this._listeners[event]) {
       listener(data);
+    }
+  }
+
+  public dispose(): void {
+    for (const key of Object.keys(this._listeners)) {
+      this._listeners[key].length = 0;
+      delete this._listeners[key];
     }
   }
 }

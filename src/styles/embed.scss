@@ -1,11 +1,4 @@
-.file {
-  border: 2px solid transparent;
-
-  &_audio,
-  &_video {
-    border: 2px dashed var(--border);
-  }
-
+.embed {
   &__link {
     display: block;
 
@@ -13,14 +6,12 @@
     height: 100%;
   }
 
-  &__picture,
   &__image {
+    object-fit: cover;
+    object-position: center;
+
     width: 100%;
     height: 100%;
-  }
-
-  &__picture {
-    background: #eeeeee;
 
     opacity: 1;
     transition: opacity 200ms ease;
@@ -32,10 +23,5 @@
         opacity: 1;
       }
     }
-  }
-
-  &__image {
-    object-fit: cover;
-    object-position: center;
   }
 }
