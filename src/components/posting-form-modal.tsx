@@ -50,8 +50,8 @@ export function PostingFormModal({ title, slug, parentId, showSubject }: Posting
     const width = Number(localStorage.getItem(POSTING_FORM_WIDTH) || MODAL_MIN_WIDTH);
     const height = Number(localStorage.getItem(POSTING_FORM_HEIGHT) || MODAL_MIN_HEIGHT);
 
-    const x = Number(localStorage.getItem(POSTING_FORM_LEFT) || window.innerWidth / 2 - width / 2);
-    const y = Number(localStorage.getItem(POSTING_FORM_TOP) || window.innerHeight / 2 - height / 2);
+    const x = Number(localStorage.getItem(POSTING_FORM_LEFT) || window.innerWidth / 2) - width / 2;
+    const y = Number(localStorage.getItem(POSTING_FORM_TOP) || window.innerHeight / 2) - height / 2;
 
     return { x, y };
   });

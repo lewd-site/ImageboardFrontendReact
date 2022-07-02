@@ -3,16 +3,19 @@ import { useEffect, useMemo, useState } from 'react';
 import cache from '../cache';
 import { Board, Post, Thread as ThreadModel } from '../domain';
 import { eventBus } from '../event-bus';
-import { POST_CREATED } from '../events';
+import { POST_CREATED, SHOW_POST_FORM } from '../events';
 import { updateFavicon, updateTitle } from '../favicon';
 import ThreadPageModel from '../model/thread-page';
+import settings from '../settings';
 import { OWN_POST_IDS_CHANGED, storage } from '../storage';
 import { LocationGenerics } from '../types';
 import { isAtBottom, scrollToBottom } from '../utils';
 import { Layout } from './layout';
 import { Lightbox, useLightbox } from './lightbox';
 import { PostList } from './post-list';
+import { PostingForm } from './posting-form';
 import { PostingFormModal } from './posting-form-modal';
+import { PostingFormWrapper } from './posting-form-static';
 import { ScrollButtons } from './scroll-buttons';
 import { Thread } from './thread';
 
@@ -86,6 +89,21 @@ export function ThreadPage() {
 
   const { lightboxVisible, file, setResetPosition, onThumbnailClick, onLightboxClose } = useLightbox();
 
+  const opPost = useMemo(() => {
+    if (thread === null) {
+      return null;
+    }
+
+    return (
+      <Thread
+        className="thread-page__thread"
+        thread={thread}
+        ownPostIds={ownPostIds}
+        onThumbnailClick={onThumbnailClick}
+      />
+    );
+  }, [thread, ownPostIds, onThumbnailClick]);
+
   const postList = useMemo(
     () => (
       <PostList
@@ -99,7 +117,12 @@ export function ThreadPage() {
   );
 
   const postingFormModal = useMemo(
-    () => <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />,
+    () =>
+      settings.form === 'floating' ? (
+        <PostingFormModal title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />
+      ) : (
+        <PostingFormWrapper title={`Ответ в тред #${parentId}`} slug={slug} parentId={parentId} showSubject={false} />
+      ),
     [slug, parentId]
   );
 
@@ -113,14 +136,7 @@ export function ThreadPage() {
   return (
     <Layout boards={boards}>
       <div className="thread-page">
-        {thread && (
-          <Thread
-            className="thread-page__thread"
-            thread={thread}
-            ownPostIds={ownPostIds}
-            onThumbnailClick={onThumbnailClick}
-          />
-        )}
+        {opPost}
         {postList}
         {postingFormModal}
         {lightbox}

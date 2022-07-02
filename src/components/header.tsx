@@ -2,6 +2,7 @@ import { useMatches } from '@tanstack/react-location';
 import { useCallback } from 'react';
 import { eventBus } from '../event-bus';
 import { HIDE_MENU, HIDE_SETTINGS, SHOW_MENU, SHOW_POST_FORM, SHOW_SETTINGS } from '../events';
+import settings from '../settings';
 import { LocationGenerics } from '../types';
 
 export function Header() {
@@ -36,7 +37,7 @@ export function Header() {
           </button>
         )}
 
-        {matches.some((match) => match.route.meta?.name === 'thread') && (
+        {matches.some((match) => match.route.meta?.name === 'thread') && settings.form === 'floating' && (
           <button type="button" className="header__show-post-form" onClick={showPostForm}>
             <span className="icon icon_discussion"></span>
             Ответить в тред

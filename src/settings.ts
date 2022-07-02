@@ -1,5 +1,6 @@
 const SETTINGS_THEME = 'settings.theme';
 const SETTINGS_NSFW = 'settings.nsfw';
+const SETTINGS_FORM = 'settings.form';
 const TRUE = 'true';
 const FALSE = 'false';
 
@@ -11,10 +12,12 @@ export class Settings {
 
   protected _theme: string;
   protected _nsfw: boolean;
+  protected _form: string;
 
   public constructor() {
     this._theme = localStorage.getItem(SETTINGS_THEME) || 'system';
     this._nsfw = localStorage.getItem(SETTINGS_NSFW) === TRUE;
+    this._form = localStorage.getItem(SETTINGS_FORM) || 'floating';
   }
 
   public get theme() {
@@ -35,6 +38,16 @@ export class Settings {
     this._nsfw = nsfw;
     this.listeners.forEach((listener) => listener(this));
     localStorage.setItem(SETTINGS_NSFW, nsfw ? TRUE : FALSE);
+  }
+
+  public get form() {
+    return this._form;
+  }
+
+  public set form(form: string) {
+    this._form = form;
+    this.listeners.forEach((listener) => listener(this));
+    localStorage.setItem(SETTINGS_FORM, form);
   }
 
   public subscribe(listener: Listener): Unsubscribe {

@@ -1,0 +1,32 @@
+.posting-form-wrapper {
+  display: flex;
+  flex-flow: column nowrap;
+
+  min-height: 240px;
+
+  padding: 4px 8px 8px;
+
+  &__header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+
+    margin: 0 0 8px;
+  }
+
+  &__title {
+    flex: 1;
+
+    text-align: center;
+
+    margin: 0;
+  }
+
+  &__body {
+    flex: 1;
+    align-self: center;
+
+    width: 100%;
+    max-width: 600px;
+  }
+}
